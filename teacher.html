@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Studio | Academy Pro</title>
+    <link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2563eb">
     <link rel="icon" href="./Imag/2.jpg" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="config.js"></script>
@@ -171,25 +175,24 @@
         const cUrl = document.getElementById('cUrl');
 
         typeSelect.addEventListener('change', () => {
-            const t = typeSelect.value;
-            cUrl.value = "";
-            if(t === 'video') {
-                urlLabel.innerText = "YouTube Link";
-                urlIcon.className = "fa-brands fa-youtube absolute left-4 top-3.5 text-red-500 text-xl";
-                cUrl.placeholder = "https://youtube.com/watch?v=...";
-                urlHint.innerText = "Video will be embedded automatically.";
-            } else if (t === 'lesson') {
-                urlLabel.innerText = "Google Drive Link (PDF)";
-                urlIcon.className = "fa-brands fa-google-drive absolute left-4 top-3.5 text-blue-500 text-xl";
-                cUrl.placeholder = "https://drive.google.com/file/d/.../view";
-                urlHint.innerText = "⚠️ Ensure the file access is set to 'Anyone with the link'.";
-            } else {
-                urlLabel.innerText = "Google Form Link";
-                urlIcon.className = "fa-solid fa-list-check absolute left-4 top-3.5 text-purple-500 text-xl";
-                cUrl.placeholder = "https://docs.google.com/forms/d/.../viewform";
-                urlHint.innerText = "Copy the standard 'Send' link from Google Forms.";
-            }
-        });
+        const t = typeSelect.value;
+        cUrl.value = "";
+        if(t === 'video') {
+            urlLabel.innerText = "رابط الفيديو (YouTube أو Google Drive)";
+            urlIcon.className = "fa-solid fa-circle-play absolute left-4 top-3.5 text-red-500 text-xl";
+            cUrl.placeholder = "ضع رابط اليوتيوب أو رابط فيديو جوجل درايف هنا...";
+            urlHint.innerText = "المنصة ستتعرف على نوع الفيديو وتفتحه في الشاشة الكاملة تلقائياً.";
+        } 
+        // بقية الأكواد كما هي...
+    });
+
+    // دالة جلب فيديو جوجل درايف (إضافية للتأكد من الرابط)
+    function processVideoUrl(url) {
+        if(url.includes("drive.google.com")) {
+            return url.replace("/view", "/preview");
+        }
+        return url;
+    }
 
         let teacherContent = [];
 
@@ -275,6 +278,13 @@
         async function saveStudent(name) { await fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', body: JSON.stringify({ action:"updateStudent", subject:user.subject, studentName:name, attendance:document.getElementById(`att-${name}`).value })}); alert("Saved!"); }
         function setView(v) { document.getElementById('view-content').classList.toggle('hidden', v!=='content'); document.getElementById('view-students').classList.toggle('hidden', v!=='students'); document.getElementById('btn-content').className = v==='content' ? "w-full text-left px-5 py-4 rounded-2xl font-semibold transition flex items-center gap-3 bg-blue-50 text-blue-600 border-r-4 border-blue-600" : "w-full text-left px-5 py-4 rounded-2xl font-semibold text-slate-500 hover:bg-slate-50 transition flex items-center gap-3 border-r-4 border-transparent"; document.getElementById('btn-students').className = v==='students' ? "w-full text-left px-5 py-4 rounded-2xl font-semibold transition flex items-center gap-3 bg-blue-50 text-blue-600 border-r-4 border-blue-600" : "w-full text-left px-5 py-4 rounded-2xl font-semibold text-slate-500 hover:bg-slate-50 transition flex items-center gap-3 border-r-4 border-transparent"; if(window.innerWidth < 768) toggleSidebar(); }
         loadData();
+        if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker Registered'))
+        .catch(err => console.log('SW Registration Failed', err));
+    });
+  }
     </script>
 </body>
 </html>

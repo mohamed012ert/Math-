@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eng: Mohamed Mostafa</title>
+    <link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2563eb">
     <link rel="icon" href="./Imag/2.jpg" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="config.js"></script>
@@ -160,6 +164,13 @@
                 }, 1500);
             }
         });
+        if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker Registered'))
+        .catch(err => console.log('SW Registration Failed', err));
+    });
+  }
     </script>
     
     <!-- Add Shake Keyframe for Tailwind config if needed, or inline style here -->
@@ -169,6 +180,7 @@
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
+        
     </style>
 </body>
 </html>
