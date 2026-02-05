@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Academy Pro</title>
+    <link rel="icon" href="./Imag/2.jpg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        
+        /* تصميم البطاقات - نظام App Icons */
+        .content-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #f1f5f9;
+            cursor: pointer;
+        }
+        .content-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.08);
+            border-color: #3b82f6;
+        }
+
+        /* نافذة العرض الكاملة - بدون حواف */
+        .fullscreen-overlay {
+            position: fixed;
+            inset: 0;
+            background: black;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+        }
+        .fullscreen-overlay.active { display: flex; }
+
+        .iframe-wrapper {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            background: black;
+        }
+        
+        /* زر الإغلاق العائم فوق الفيديو */
+        .close-video-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .close-video-btn:hover { background: rgba(239, 68, 68, 0.9); transform: rotate(90deg); }
+
+        /* أزرار الفلترة الأنيقة */
+        .filter-chip {
+            padding: 8px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            background: white;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+        .filter-chip.active {
+            background: #1e293b;
+            color: white;
+            border-color: #1e293b;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div id="videoModal" class="fullscreen-overlay">
+        <button onclick="closeViewer()" class="close-video-btn">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+        <div class="iframe-wrapper">
+            <iframe id="mainIframe" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen class="w-full h-full"></iframe>
+        </div>
+    </div>
+
+    <nav class="bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight">Mohamed <span class="text-blue-600">Academy</span></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden md:block text-right">
+                    <p class="font-bold text-sm" id="studentName">Student</p>
+                    <p class="text-[10px] text-blue-500 font-bold uppercase tracking-widest" id="gradeBadge">Grade</p>
+                </div>
+                <button onclick="location.reload()" class="p-2 hover:bg-slate-100 rounded-full transition"><i class="fa-solid fa-house text-slate-400"></i></button>
+                <a href="index.html" class="p-2 hover:text-red-500 rounded-full transition"><i class="fa-solid fa-power-off"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-6">
+        
+        <div id="subjectGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+            <div onclick="openSubject('Math')" class="content-card">
+                <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg">Mathematics</h3>
+                    <p class="text-sm text-slate-400">View all lectures and quizzes</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="contentSection" class="hidden mt-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                <h2 id="viewTitle" class="text-3xl font-black text-slate-800">Mathematics</h2>
+                
+                <div class="flex gap-2 overflow-x-auto pb-2">
+                    <button onclick="applyFilter('all')" id="f-all" class="filter-chip active">All</button>
+                    <button onclick="applyFilter('video')" id="f-video" class="filter-chip"><i class="fa-solid fa-play mr-2"></i>Videos</button>
+                    <button onclick="applyFilter('lesson')" id="f-lesson" class="filter-chip"><i class="fa-solid fa-book mr-2"></i>PDFs</button>
+                    <button onclick="applyFilter('quiz')" id="f-quiz" class="filter-chip"><i class="fa-solid fa-trophy mr-2"></i>Quizzes</button>
+                </div>
+            </div>
+
+            <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                </div>
+        </div>
+    </main>
+
+    <script>
+        const user = JSON.parse(sessionStorage.getItem('academyUser'));
+        if(!user) window.location.href = 'index.html';
+
+        document.getElementById('studentName').innerText = user.name;
+        document.getElementById('gradeBadge').innerText = "Grade " + user.grade;
+
+        let allMaterials = [];
+
+        async function openSubject(subj) {
+            document.getElementById('subjectGrid').classList.add('hidden');
+            document.getElementById('contentSection').classList.remove('hidden');
+            document.getElementById('viewTitle').innerText = subj;
+
+            const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getContent&grade=${user.grade}&subject=${subj}`);
+            allMaterials = await res.json();
+            renderCards(allMaterials);
+        }
+
+        function applyFilter(type) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            document.getElementById('f-' + type).classList.add('active');
+            
+            const filtered = type === 'all' ? allMaterials : allMaterials.filter(m => m.type === type);
+            renderCards(filtered);
+        }
+
+        function renderCards(list) {
+            const grid = document.getElementById('cardsGrid');
+            if(list.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-20 text-center text-slate-300"><i class="fa-regular fa-folder-open text-5xl mb-4"></i><p>No content available yet.</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = list.map(item => {
+                let iconClass = "bg-blue-50 text-blue-500", icon = "fa-file-pdf", typeLabel = "Document";
+                
+                if(item.type === 'video') { 
+                    iconClass = "bg-red-50 text-red-500"; 
+                    icon = "fa-play"; 
+                    typeLabel = "Lecture Video"; 
+                } else if(item.type === 'quiz') { 
+                    iconClass = "bg-amber-50 text-amber-500"; 
+                    icon = "fa-trophy"; 
+                    typeLabel = "Practice Quiz"; 
+                }
+
+                return `
+                <div onclick="launchViewer('${item.type}', '${item.content || item.data}', '${item.title}')" class="content-card">
+                    <div class="w-12 h-12 ${iconClass} rounded-xl flex items-center justify-center text-lg shrink-0">
+                        <i class="fa-solid ${icon}"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">${typeLabel}</p>
+                        <h4 class="font-bold text-slate-800 text-sm truncate">${item.title}</h4>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function launchViewer(type, url, title) {
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('mainIframe');
+            let finalUrl = "";
+
+            if(type === 'video') {
+                const vidId = getYoutubeId(url);
+                // استخدام معايير اليوتيوب الرسمية لتشغيل نظيف وفول سكرين
+                finalUrl = `https://www.youtube.com/embed/${vidId}?autoplay=1&rel=0&modestbranding=1&showinfo=0`;
+            } else if(type === 'lesson') {
+                finalUrl = url.includes("drive.google.com") ? url.replace(/\/view.*/, '/preview') : url;
+            } else if(type === 'quiz') {
+                finalUrl = url.includes("?") ? url + "&embedded=true" : url + "?embedded=true";
+            }
+
+            iframe.src = finalUrl;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeViewer() {
+            const modal = document.getElementById('videoModal');
+            document.getElementById('mainIframe').src = "";
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function getYoutubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+    </script>
+</body>
+</html>

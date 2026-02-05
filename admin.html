@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academy Pro | Admin Dashboard</title>
+    <link rel="icon" href="./Imag/2.jpg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #f1f5f9; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Student Tag Styling */
+        .student-tag {
+            transition: all 0.2s ease;
+            position: relative;
+            padding-right: 24px; /* Space for X */
+        }
+        .student-tag:hover {
+            background-color: #fee2e2; /* Red-50 */
+            color: #ef4444; /* Red-500 */
+            border-color: #fca5a5;
+            cursor: pointer;
+        }
+        .student-tag::after {
+            content: "\f00d"; /* FontAwesome X */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .student-tag:hover::after { opacity: 1; }
+
+        /* Sidebar Active State */
+        .nav-item.active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden text-slate-800">
+
+    <!-- 🔒 LOCK SCREEN -->
+    <div id="lockScreen" class="fixed inset-0 z-[99] bg-slate-900 flex flex-col items-center justify-center text-white transition-opacity duration-500">
+        <div class="bg-slate-800 p-10 rounded-3xl shadow-2xl w-full max-w-sm text-center border border-slate-700 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+            <div class="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-6 ring-4 ring-slate-600">
+                <i class="fa-solid fa-fingerprint text-4xl text-blue-400"></i>
+            </div>
+            <h2 class="text-3xl font-bold mb-2 tracking-tight">Admin Access</h2>
+            <p class="text-slate-400 text-sm mb-8">Secure Environment</p>
+            <form onsubmit="unlock(event)" class="relative">
+                <input type="password" id="masterKey" class="w-full px-5 py-4 bg-slate-900 border border-slate-600 rounded-xl outline-none text-center tracking-[0.5em] text-xl transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder-slate-600" placeholder="••••" required>
+                <button class="absolute right-2 top-2 bottom-2 bg-blue-600 hover:bg-blue-500 text-white px-4 rounded-lg transition"><i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+            <p id="errorMsg" class="text-red-400 text-xs mt-4 font-bold hidden animate-pulse">⛔ Access Denied</p>
+        </div>
+    </div>
+
+    <!-- 🖥️ MAIN PANEL -->
+    <div id="mainPanel" class="hidden w-full h-full flex">
+        
+        <!-- SIDEBAR -->
+        <aside class="w-72 bg-white border-r border-slate-200 flex flex-col z-20 shadow-lg">
+            <div class="h-24 flex items-center px-8 border-b border-slate-50">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white mr-3 shadow-lg shadow-blue-200"><i class="fa-solid fa-layer-group"></i></div>
+                <h1 class="font-bold text-xl tracking-tight text-slate-800">Academy<span class="text-blue-600">Pro</span></h1>
+            </div>
+            
+            <nav class="flex-1 p-5 space-y-3">
+                <button onclick="view('classes')" id="btn-classes" class="nav-item active w-full text-left px-5 py-4 rounded-xl font-semibold text-slate-500 hover:bg-slate-50 transition flex items-center gap-4">
+                    <i class="fa-solid fa-chalkboard-user text-lg w-6"></i> Classes & Staff
+                </button>
+                <button onclick="view('teachers')" id="btn-teachers" class="nav-item w-full text-left px-5 py-4 rounded-xl font-semibold text-slate-500 hover:bg-slate-50 transition flex items-center gap-4">
+                    <i class="fa-solid fa-user-plus text-lg w-6"></i> Add Teachers
+                </button>
+                <button onclick="view('students')" id="btn-students" class="nav-item w-full text-left px-5 py-4 rounded-xl font-semibold text-slate-500 hover:bg-slate-50 transition flex items-center gap-4">
+                    <i class="fa-solid fa-graduation-cap text-lg w-6"></i> Students Directory
+                </button>
+            </nav>
+
+            <div class="p-6 border-t border-slate-50">
+                <a href="index.html" class="flex items-center justify-center gap-3 text-red-500 font-bold bg-red-50 py-3 rounded-xl hover:bg-red-100 transition shadow-sm border border-red-100"><i class="fa-solid fa-power-off"></i> Logout</a>
+            </div>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto p-8 relative">
+            
+            <!-- 1. CLASS MANAGEMENT (MAIN DASHBOARD) -->
+            <div id="view-classes" class="max-w-7xl mx-auto">
+                <header class="flex justify-between items-center mb-10">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-800">Classrooms</h2>
+                        <p class="text-slate-500 mt-1">Manage teacher assignments and student rosters.</p>
+                    </div>
+                    <button onclick="loadData()" class="bg-white border border-slate-200 text-slate-600 px-5 py-2.5 rounded-xl font-bold shadow-sm hover:bg-slate-50 transition flex items-center gap-2"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                </header>
+
+                <div id="classesGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    <!-- Cards Injected Here -->
+                    <div class="col-span-full text-center py-20 text-slate-400 animate-pulse">Loading System Data...</div>
+                </div>
+            </div>
+
+            <!-- 2. ADD TEACHERS VIEW -->
+            <div id="view-teachers" class="hidden max-w-5xl mx-auto">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6">Staff Management</h2>
+                
+                <!-- Add Card -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-8">
+                    <h3 class="font-bold text-lg mb-6 flex items-center gap-3 text-blue-600">
+                        <span class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center"><i class="fa-solid fa-plus"></i></span> Create New Teacher
+                    </h3>
+                    <form id="addTeacherForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <input id="tName" placeholder="Full Name (e.g. Mr. Ahmed)" class="p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition" required>
+                        <input id="tPass" placeholder="Login Password" class="p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition" required>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Subject</label>
+                            <div class="flex gap-4">
+                                <label class="flex-1 cursor-pointer"><input type="radio" name="subj" value="Math" checked class="peer sr-only"><div class="text-center py-3 rounded-xl border-2 border-slate-200 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 font-bold text-slate-500 transition hover:bg-slate-50">Math</div></label>
+                                <label class="flex-1 cursor-pointer"><input type="radio" name="subj" value="Science" class="peer sr-only"><div class="text-center py-3 rounded-xl border-2 border-slate-200 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-600 font-bold text-slate-500 transition hover:bg-slate-50">Science</div></label>
+                                <label class="flex-1 cursor-pointer"><input type="radio" name="subj" value="English" class="peer sr-only"><div class="text-center py-3 rounded-xl border-2 border-slate-200 peer-checked:border-orange-500 peer-checked:bg-orange-50 peer-checked:text-orange-600 font-bold text-slate-500 transition hover:bg-slate-50">English</div></label>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-3 ml-1">Allowed Grades</label>
+                            <div class="grid grid-cols-9 gap-2" id="gradeBoxes"></div>
+                        </div>
+
+                        <button class="md:col-span-2 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-black transition shadow-lg mt-2">Create Account</button>
+                    </form>
+                </div>
+
+                <!-- Simple List for Deletion -->
+                <h3 class="font-bold text-slate-400 uppercase text-xs mb-4 tracking-wider">Existing Staff</h3>
+                <div id="staffList" class="grid gap-3"></div>
+            </div>
+
+            <!-- 3. STUDENTS DIRECTORY -->
+            <div id="view-students" class="hidden max-w-6xl mx-auto">
+                <header class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Student Directory</h2>
+                        <p class="text-slate-500 text-sm">Total registered students database.</p>
+                    </div>
+                    <button onclick="document.getElementById('addStudentModal').classList.remove('hidden')" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center gap-2"><i class="fa-solid fa-plus"></i> Add Student</button>
+                </header>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-100 text-xs uppercase text-slate-500 font-bold">
+                            <tr><th class="p-5">Name</th><th class="p-5">Grade</th><th class="p-5">Password</th><th class="p-5 text-right">Action</th></tr>
+                        </thead>
+                        <tbody id="studentsList" class="divide-y divide-slate-50 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 🟡 MODAL: ASSIGN STUDENTS -->
+    <div id="assignModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-white w-[500px] max-h-[80vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="assignModalContent">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div>
+                    <h3 class="font-bold text-lg text-slate-800">Add Students</h3>
+                    <p class="text-xs text-slate-500">Assigning to <span id="modalTName" class="text-blue-600 font-bold">...</span></p>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-2" id="checklist">
+                <!-- Students Checkboxes -->
+            </div>
+
+            <div class="p-5 border-t border-slate-100 bg-slate-50 flex gap-3">
+                <button onclick="closeModal()" class="flex-1 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-200 transition">Cancel</button>
+                <button onclick="saveAssignment()" class="flex-1 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition shadow-lg">Confirm Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🟢 MODAL: ADD STUDENT -->
+    <div id="addStudentModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl w-96 shadow-2xl">
+            <h3 class="text-xl font-bold mb-6 text-slate-800">Register Student</h3>
+            <form id="addStudentForm" class="space-y-4">
+                <input id="sName" placeholder="Full Name" class="w-full p-3 border rounded-xl bg-slate-50 focus:bg-white outline-none focus:border-blue-500" required>
+                <input id="sPass" placeholder="Password" class="w-full p-3 border rounded-xl bg-slate-50 focus:bg-white outline-none focus:border-blue-500" required>
+                <select id="sGrade" class="w-full p-3 border rounded-xl bg-slate-50 focus:bg-white outline-none font-bold text-slate-600"><script>for(let i=1;i<=9;i++)document.write(`<option value="${i}">Grade ${i}</option>`)</script></select>
+                <button class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition shadow-lg mt-2">Add Student</button>
+            </form>
+            <button onclick="document.getElementById('addStudentModal').classList.add('hidden')" class="w-full mt-3 text-slate-400 text-sm font-bold hover:text-slate-600">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const MASTER_PASS = "admin123";
+        let teachersData = [], studentsData = [];
+        let currentTeacher = "";
+
+        function unlock(e) { e.preventDefault(); if(document.getElementById('masterKey').value===MASTER_PASS){document.getElementById('lockScreen').style.opacity='0'; setTimeout(()=>{document.getElementById('lockScreen').style.display='none';document.getElementById('mainPanel').classList.remove('hidden');init();},500);}else{document.getElementById('errorMsg').classList.remove('hidden');}}
+
+        async function init() {
+            const gb = document.getElementById('gradeBoxes');
+            for(let i=1;i<=9;i++) gb.innerHTML+=`<label class="cursor-pointer text-center"><input type="checkbox" value="${i}" class="peer sr-only"><div class="border border-slate-200 rounded-lg py-2 hover:bg-slate-50 peer-checked:bg-slate-800 peer-checked:text-white peer-checked:border-slate-800 transition text-sm font-bold shadow-sm">${i}</div></label>`;
+            await loadData();
+        }
+
+        async function loadData() {
+            try {
+                teachersData = await (await fetch(`${GOOGLE_SCRIPT_URL}?action=getTeachers`)).json();
+                studentsData = await (await fetch(`${GOOGLE_SCRIPT_URL}?action=getAllStudents`)).json();
+                renderClasses(); renderTeachers(); renderStudents();
+            } catch(e) { console.error(e); }
+        }
+
+        // 🔥 1. CLASS CARDS (DESIGN + REMOVE LOGIC)
+        function renderClasses() {
+            const grid = document.getElementById('classesGrid');
+            if(!teachersData.length) { grid.innerHTML = "<p class='col-span-full text-center text-slate-400'>No classes found.</p>"; return; }
+
+            grid.innerHTML = teachersData.map(t => {
+                let assigned = []; try { assigned = JSON.parse(t.assignedStudents); } catch(e){}
+                
+                // Tags with Remove Functionality
+                let tags = assigned.map(s => `
+                    <span onclick="removeStudent('${t.name}', '${s}')" class="student-tag inline-flex items-center bg-slate-50 border border-slate-200 text-slate-600 text-[11px] px-2 py-1 rounded-md font-bold mb-1 mr-1" title="Click to remove">
+                        ${s}
+                    </span>`).join('');
+                
+                if(!tags) tags = "<span class='text-xs text-slate-400 italic pl-1'>No students yet.</span>";
+
+                return `
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition duration-300 flex flex-col h-full">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-800">${t.name}</h3>
+                            <span class="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">${t.subject}</span>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-500">${assigned.length}</div>
+                    </div>
+                    
+                    <div class="flex-1 mb-4 bg-slate-50/50 rounded-xl p-3 border border-slate-100 overflow-y-auto max-h-32">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Class Roster (Click to remove)</p>
+                        ${tags}
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 mt-auto">
+                        <p class="text-[10px] text-slate-400 mb-3 font-bold uppercase"><i class="fa-solid fa-layer-group mr-1"></i> Grades: ${JSON.parse(t.grades).join(', ')}</p>
+                        <button onclick="openAssign('${t.name}')" class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-blue-600 transition shadow-lg shadow-slate-200">
+                            <i class="fa-solid fa-user-plus mr-2"></i> Add Students
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // 🔥 2. ADD STUDENTS (FILTERED CHECKLIST)
+        function openAssign(name) {
+            currTeacher = name;
+            document.getElementById('modalTName').innerText = name;
+            document.getElementById('assignModal').classList.remove('hidden');
+            setTimeout(()=>document.getElementById('assignModalContent').classList.remove('scale-95'),10);
+
+            const teacher = teachersData.find(t => t.name === name);
+            const allowed = JSON.parse(teacher.grades).map(String);
+            const current = teacher.assignedStudents ? JSON.parse(teacher.assignedStudents) : [];
+            
+            // Show only eligible students NOT already assigned
+            const eligible = studentsData.filter(s => allowed.includes(String(s.grade)) && !current.includes(s.name));
+
+            document.getElementById('checklist').innerHTML = eligible.length ? eligible.map(s => `
+                <label class="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer border-b last:border-0 transition group">
+                    <input type="checkbox" value="${s.name}" class="st-cb w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <div class="flex-1 flex justify-between">
+                        <span class="font-bold text-slate-700 group-hover:text-blue-700">${s.name}</span>
+                        <span class="text-[10px] bg-slate-100 px-2 py-0.5 rounded font-bold text-slate-500">G${s.grade}</span>
+                    </div>
+                </label>`).join('') : '<div class="text-center p-10 text-slate-400 flex flex-col items-center"><i class="fa-solid fa-check-circle text-3xl mb-2 text-green-400"></i><p>All eligible students added.</p></div>';
+        }
+
+        async function saveAssignment() {
+            const selected = Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value);
+            if(selected.length === 0) return alert("Select at least one!");
+
+            const teacher = teachersData.find(t => t.name === currTeacher);
+            const oldList = teacher.assignedStudents ? JSON.parse(teacher.assignedStudents) : [];
+            const newList = [...oldList, ...selected]; // 🔥 MERGE: Keep old, add new
+
+            const btn = document.querySelector('#assignModal button:last-child'); btn.innerText = "Saving...";
+            
+            await fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', body:JSON.stringify({
+                action:"assignStudents", teacherName:currTeacher, studentsList:newList
+            })});
+            
+            btn.innerText = "Confirm Add";
+            closeModal();
+            loadData();
+        }
+
+        // 🔥 3. REMOVE STUDENT LOGIC
+        async function removeStudent(tName, sName) {
+            if(!confirm(`Remove ${sName} from this class?`)) return;
+            
+            const teacher = teachersData.find(t => t.name === tName);
+            const oldList = JSON.parse(teacher.assignedStudents);
+            const newList = oldList.filter(s => s !== sName); // Filter out
+
+            await fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', body:JSON.stringify({
+                action:"assignStudents", teacherName:tName, studentsList:newList
+            })});
+            loadData();
+        }
+
+        // --- STANDARD FUNCTIONS ---
+        function renderTeachers() {
+            document.getElementById('staffList').innerHTML = teachersData.map(t => 
+                `<div class="flex justify-between items-center p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+                    <div><h4 class="font-bold text-slate-800">${t.name}</h4><p class="text-xs text-slate-400">${t.subject} • Pass: ${t.pass}</p></div>
+                    <button onclick="del('${t.name}','teacher')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition"><i class="fa-solid fa-trash-can"></i></button>
+                </div>`).join('');
+        }
+        function renderStudents() {
+            document.getElementById('studentsList').innerHTML = studentsData.map(s => 
+                `<tr class="hover:bg-slate-50 transition border-b last:border-0 border-slate-100">
+                    <td class="p-5 font-bold text-slate-700">${s.name}</td>
+                    <td class="p-5"><span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded font-bold">G${s.grade}</span></td>
+                    <td class="p-5 font-mono text-xs text-slate-400">${s.pass}</td>
+                    <td class="p-5 text-right"><button onclick="del('${s.name}','student')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash-can"></i></button></td>
+                </tr>`).join('');
+        }
+
+        document.getElementById('addTeacherForm').addEventListener('submit', async (e)=>{ e.preventDefault(); const grades = Array.from(document.querySelectorAll('#gradeBoxes input:checked')).map(c=>c.value); if(!grades.length) return alert("Select grades!"); const btn=e.target.querySelector('button'); btn.innerText="Creating..."; await fetch(GOOGLE_SCRIPT_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:"addTeacher", name:document.getElementById('tName').value, pass:document.getElementById('tPass').value, subject:document.querySelector('input[name="subj"]:checked').value, grades})}); btn.innerText="Create Account"; e.target.reset(); loadData(); });
+        document.getElementById('addStudentForm').addEventListener('submit', async (e)=>{ e.preventDefault(); const btn=e.target.querySelector('button'); btn.innerText="Adding..."; await fetch(GOOGLE_SCRIPT_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:"addStudent", name:document.getElementById('sName').value, pass:document.getElementById('sPass').value, grade:document.getElementById('sGrade').value})}); btn.innerText="Add Student"; document.getElementById('addStudentModal').classList.add('hidden'); e.target.reset(); loadData(); });
+        async function del(n,r) { if(confirm("Delete?")) await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify({action:"deleteUser",name:n,role:r})}); loadData(); }
+        function closeModal() { document.getElementById('assignModal').classList.add('hidden'); document.getElementById('assignModalContent').classList.add('scale-95'); }
+        function view(v) { ['classes','teachers','students'].forEach(id=>{document.getElementById(`view-${id}`).classList.add('hidden'); document.getElementById(`btn-${id}`).classList.remove('active');}); document.getElementById(`view-${v}`).classList.remove('hidden'); document.getElementById(`btn-${v}`).classList.add('active'); }
+    </script>
+</body>
+</html>

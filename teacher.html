@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Studio | Academy Pro</title>
+    <link rel="icon" href="./Imag/2.jpg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
+        .glass { background: white; border: 1px solid #f1f5f9; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
+        
+        #sidebar { transition: transform 0.3s ease-in-out; z-index: 50; }
+        .sidebar-open { transform: translateX(0) !important; }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; backdrop-filter: blur(4px); }
+        .overlay.active { display: block; }
+
+        .input-field { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; outline: none; transition: all 0.2s; }
+        .input-field:focus { border-color: #3b82f6; background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .table-container::-webkit-scrollbar { height: 6px; }
+        .table-container::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .filter-chip.active { background-color: #1e293b; color: white; border-color: #1e293b; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row text-slate-800">
+
+    <div class="md:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200 sticky top-0 z-[60]">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white text-sm"><i class="fa-solid fa-chalkboard-user"></i></div>
+            <span class="font-bold tracking-tight">Teacher<span class="text-blue-600">Studio</span></span>
+        </div>
+        <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600"><i class="fa-solid fa-bars-staggered"></i></button>
+    </div>
+
+    <div id="sidebarOverlay" class="overlay" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-white border-r border-slate-200 flex flex-col transform -translate-x-full md:translate-x-0 md:relative md:flex shadow-2xl md:shadow-none">
+        <div class="p-8 border-b border-slate-50">
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="text-2xl font-bold text-slate-800 tracking-tight" id="teacherName">...</h2>
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-400"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest" id="subjectBadge">Subject</span>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <label class="text-[10px] font-black text-slate-400 uppercase mb-3 block ml-1 tracking-widest">Selected Classroom</label>
+            <div class="relative">
+                <select id="gradeSelect" class="w-full p-4 pl-10 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-slate-700 appearance-none cursor-pointer hover:border-blue-400 transition focus:outline-none" onchange="loadData()"></select>
+                <i class="fa-solid fa-chalkboard absolute left-4 top-5 text-slate-400"></i>
+                <i class="fa-solid fa-chevron-down absolute right-4 top-5 text-slate-400 text-[10px]"></i>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2 mt-2">
+            <button onclick="setView('content')" id="btn-content" class="w-full text-left px-5 py-4 rounded-2xl font-semibold transition flex items-center gap-3 bg-blue-50 text-blue-600 border-r-4 border-blue-600">
+                <i class="fa-solid fa-layer-group text-lg"></i> Content Library
+            </button>
+            <button onclick="setView('students')" id="btn-students" class="w-full text-left px-5 py-4 rounded-2xl font-semibold text-slate-500 hover:bg-slate-50 transition flex items-center gap-3 border-r-4 border-transparent">
+                <i class="fa-solid fa-users-viewfinder text-lg"></i> My Students
+            </button>
+        </nav>
+        
+        <div class="p-6 border-t border-slate-50">
+            <a href="index.html" class="flex items-center justify-center gap-3 text-red-500 font-bold px-4 py-4 rounded-2xl bg-red-50 hover:bg-red-100 transition"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-5 md:p-12 overflow-x-hidden">
+        <header class="mb-10">
+            <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Grade <span id="currentGradeDisplay" class="text-blue-600">...</span></h1>
+            <p class="text-slate-500 mt-1">Manage your classroom materials and track performance.</p>
+        </header>
+
+        <div id="view-content" class="max-w-5xl mx-auto space-y-10">
+            
+            <div class="glass p-6 md:p-8 rounded-[2.5rem]">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-200"><i class="fa-solid fa-plus text-xl"></i></div>
+                    <h3 class="font-bold text-xl text-slate-800 tracking-tight">Publish New Lesson</h3>
+                </div>
+
+                <form id="addContentForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="relative">
+                            <select id="cType" class="input-field appearance-none font-bold text-slate-700 cursor-pointer pr-10">
+                                <option value="video">磁 Video (YouTube)</option>
+                                <option value="lesson">当 PDF (Google Drive)</option>
+                                <option value="quiz">醇 Quiz (Google Form)</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-[10px]"></i>
+                        </div>
+                        <input id="cTitle" type="text" placeholder="Title (e.g. Algebra I - Week 1)" class="input-field md:col-span-2 font-bold" required>
+                    </div>
+
+                    <textarea id="cDesc" placeholder="Short description or instructions..." class="input-field h-24 resize-none"></textarea>
+
+                    <div id="linkField">
+                        <label id="urlLabel" class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 tracking-widest">YouTube Link</label>
+                        <div class="relative">
+                            <input id="cUrl" type="url" placeholder="Paste Link Here..." class="input-field pl-12 text-blue-600 font-medium" required>
+                            <i id="urlIcon" class="fa-brands fa-youtube absolute left-4 top-3.5 text-slate-400 text-xl"></i>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-2 ml-1" id="urlHint">Paste the full YouTube video URL.</p>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button class="w-full md:w-auto bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-paper-plane"></i> Publish Content
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 px-2 gap-4">
+                    <h3 class="font-black text-slate-400 uppercase text-[10px] tracking-widest">Library Content</h3>
+                    <div class="flex gap-2">
+                        <button onclick="filterTeacherView('all')" class="filter-chip active border border-slate-200 px-3 py-1 rounded-full text-xs font-bold text-slate-500 hover:bg-slate-50 transition">All</button>
+                        <button onclick="filterTeacherView('video')" class="filter-chip border border-slate-200 px-3 py-1 rounded-full text-xs font-bold text-slate-500 hover:bg-slate-50 transition">Videos</button>
+                        <button onclick="filterTeacherView('lesson')" class="filter-chip border border-slate-200 px-3 py-1 rounded-full text-xs font-bold text-slate-500 hover:bg-slate-50 transition">PDFs</button>
+                        <button onclick="filterTeacherView('quiz')" class="filter-chip border border-slate-200 px-3 py-1 rounded-full text-xs font-bold text-slate-500 hover:bg-slate-50 transition">Quizzes</button>
+                    </div>
+                </div>
+                
+                <div id="contentList" class="grid grid-cols-1 gap-6"></div>
+            </div>
+        </div>
+
+        <div id="view-students" class="hidden max-w-5xl mx-auto">
+            <div class="glass rounded-[2rem] overflow-hidden">
+                <div class="table-container overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50/50">
+                            <tr>
+                                <th class="p-6 font-black text-[10px] text-slate-400 uppercase tracking-widest">Student</th>
+                                <th class="p-6 font-black text-[10px] text-slate-400 uppercase tracking-widest text-center">Attendance %</th>
+                                <th class="p-6 font-black text-[10px] text-slate-400 uppercase tracking-widest text-center">Last Score</th>
+                                <th class="p-6 font-black text-[10px] text-slate-400 uppercase tracking-widest text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentList" class="divide-y divide-slate-50"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-open'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
+        const user = JSON.parse(sessionStorage.getItem('academyUser'));
+        if(!user || user.role !== 'teacher') window.location.href = 'index.html';
+
+        document.getElementById('teacherName').innerText = user.username;
+        document.getElementById('subjectBadge').innerText = user.subject;
+        const gradeSel = document.getElementById('gradeSelect');
+        try { JSON.parse(user.grades).forEach(g => gradeSel.innerHTML += `<option value="${g}">Grade ${g}</option>`); } catch(e){}
+
+        // Dynamic Input Label Changes
+        const typeSelect = document.getElementById('cType');
+        const urlLabel = document.getElementById('urlLabel');
+        const urlIcon = document.getElementById('urlIcon');
+        const urlHint = document.getElementById('urlHint');
+        const cUrl = document.getElementById('cUrl');
+
+        typeSelect.addEventListener('change', () => {
+            const t = typeSelect.value;
+            cUrl.value = "";
+            if(t === 'video') {
+                urlLabel.innerText = "YouTube Link";
+                urlIcon.className = "fa-brands fa-youtube absolute left-4 top-3.5 text-red-500 text-xl";
+                cUrl.placeholder = "https://youtube.com/watch?v=...";
+                urlHint.innerText = "Video will be embedded automatically.";
+            } else if (t === 'lesson') {
+                urlLabel.innerText = "Google Drive Link (PDF)";
+                urlIcon.className = "fa-brands fa-google-drive absolute left-4 top-3.5 text-blue-500 text-xl";
+                cUrl.placeholder = "https://drive.google.com/file/d/.../view";
+                urlHint.innerText = "⚠️ Ensure the file access is set to 'Anyone with the link'.";
+            } else {
+                urlLabel.innerText = "Google Form Link";
+                urlIcon.className = "fa-solid fa-list-check absolute left-4 top-3.5 text-purple-500 text-xl";
+                cUrl.placeholder = "https://docs.google.com/forms/d/.../viewform";
+                urlHint.innerText = "Copy the standard 'Send' link from Google Forms.";
+            }
+        });
+
+        let teacherContent = [];
+
+        async function loadData() {
+            const grade = gradeSel.value;
+            document.getElementById('currentGradeDisplay').innerText = grade;
+            const subject = user.subject;
+
+            // Content
+            const cRes = await fetch(`${GOOGLE_SCRIPT_URL}?action=getContent&grade=${grade}&subject=${subject}`);
+            teacherContent = await cRes.json();
+            
+            filterTeacherView('all'); // Render default
+
+            // Students
+            const sRes = await fetch(`${GOOGLE_SCRIPT_URL}?action=getStudents&grade=${grade}`);
+            const sData = await sRes.json();
+            const assigned = user.assignedStudents || [];
+            const filtered = sData.filter(s => assigned.includes(s.name));
+
+            document.getElementById('studentList').innerHTML = filtered.length ? filtered.map(s => `
+                <tr class="hover:bg-blue-50/30 transition-all">
+                    <td class="p-6"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">${s.name.charAt(0)}</div><span class="font-bold text-slate-700">${s.name}</span></div></td>
+                    <td class="p-6 text-center"><div class="flex items-center justify-center gap-2"><input id="att-${s.name}" value="${s.attendance[subject]||''}" class="w-16 p-2 bg-white border border-slate-200 rounded-xl text-center font-bold text-blue-600 focus:border-blue-500 outline-none" placeholder="0"><span class="text-slate-400 font-bold">%</span></div></td>
+                    <td class="p-6 text-center font-bold text-slate-500">${s.scores[subject] ? s.scores[subject] + '%' : '--'}</td>
+                    <td class="p-6 text-right"><button onclick="saveStudent('${s.name}')" class="bg-slate-900 text-white px-5 py-2 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-slate-100 text-sm">Update</button></td>
+                </tr>`).join('') : '<tr><td colspan="4" class="p-12 text-center text-slate-400">No students found.</td></tr>';
+        }
+
+        function filterTeacherView(type) {
+            document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+            event ? event.target.classList.add('active') : document.querySelector('.filter-chip').classList.add('active'); // fallback
+
+            const list = type === 'all' ? teacherContent : teacherContent.filter(c => c.type === type);
+            
+            document.getElementById('contentList').innerHTML = list.map(c => {
+                let icon = c.type==='video'?'fa-play text-red-500 bg-red-50':(c.type==='quiz'?'fa-trophy text-amber-500 bg-amber-50':'fa-book-open text-blue-500 bg-blue-50');
+                return `
+                <div class="glass p-6 rounded-[2rem] hover:border-blue-200 transition-all group">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="flex gap-4 w-full">
+                            <div class="w-12 h-12 rounded-2xl ${icon} flex items-center justify-center text-sm shrink-0 shadow-sm"><i class="fa-solid ${icon.split(' ')[0]}"></i></div>
+                            <div class="w-full overflow-hidden">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">${c.type}</span>
+                                </div>
+                                <h4 class="font-bold text-lg text-slate-800">${c.title}</h4>
+                                <p class="text-slate-500 text-sm mt-1 leading-relaxed line-clamp-1">${c.desc}</p>
+                            </div>
+                        </div>
+                        <button onclick="delContent('${c.id}')" class="w-10 h-10 flex items-center justify-center rounded-xl text-slate-300 hover:bg-red-50 hover:text-red-500 transition"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </div>`;
+            }).join('') || '<div class="text-center py-10 text-slate-400">No content found.</div>';
+        }
+
+        document.getElementById('addContentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...'; btn.disabled = true;
+            
+            // Send URL in 'content' field for all types
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({
+                    action: "addContent",
+                    subject: user.subject,
+                    grade: gradeSel.value,
+                    type: document.getElementById('cType').value,
+                    title: document.getElementById('cTitle').value,
+                    desc: document.getElementById('cDesc').value,
+                    content: document.getElementById('cUrl').value, // Send URL here
+                    author: user.username
+                })
+            });
+            
+            btn.innerHTML = original; btn.disabled = false;
+            e.target.reset(); loadData();
+        });
+
+        async function delContent(id) { if(confirm("Delete this material?")) { await fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', body: JSON.stringify({ action:"deleteContent", id})}); loadData(); } }
+        async function saveStudent(name) { await fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', body: JSON.stringify({ action:"updateStudent", subject:user.subject, studentName:name, attendance:document.getElementById(`att-${name}`).value })}); alert("Saved!"); }
+        function setView(v) { document.getElementById('view-content').classList.toggle('hidden', v!=='content'); document.getElementById('view-students').classList.toggle('hidden', v!=='students'); document.getElementById('btn-content').className = v==='content' ? "w-full text-left px-5 py-4 rounded-2xl font-semibold transition flex items-center gap-3 bg-blue-50 text-blue-600 border-r-4 border-blue-600" : "w-full text-left px-5 py-4 rounded-2xl font-semibold text-slate-500 hover:bg-slate-50 transition flex items-center gap-3 border-r-4 border-transparent"; document.getElementById('btn-students').className = v==='students' ? "w-full text-left px-5 py-4 rounded-2xl font-semibold transition flex items-center gap-3 bg-blue-50 text-blue-600 border-r-4 border-blue-600" : "w-full text-left px-5 py-4 rounded-2xl font-semibold text-slate-500 hover:bg-slate-50 transition flex items-center gap-3 border-r-4 border-transparent"; if(window.innerWidth < 768) toggleSidebar(); }
+        loadData();
+    </script>
+</body>
+</html>

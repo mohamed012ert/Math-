@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eng: Mohamed Mostafa</title>
+    <link rel="icon" href="./Imag/2.jpg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Outfit', sans-serif; overflow: hidden; }
+        
+        /* Background Animation */
+        .bg-animate {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            position: absolute; inset: 0; z-index: -1;
+        }
+        @keyframes gradient { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+
+        /* Glass Card */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        /* Toggle Animation */
+        .toggle-bg { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .input-group { transition: all 0.3s ease; }
+        .input-group:focus-within { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen relative">
+
+    <div class="bg-animate"></div>
+    
+    <!-- Floating Shapes -->
+    <div class="absolute top-20 left-20 w-32 h-32 bg-white/20 rounded-full blur-2xl animate-pulse"></div>
+    <div class="absolute bottom-20 right-20 w-48 h-48 bg-blue-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
+    <div class="glass p-10 rounded-3xl w-full max-w-md relative z-10 transform hover:scale-[1.01] transition duration-500">
+        
+        <!-- Logo / Icon -->
+        <div class="flex justify-center mb-6">
+            <div class="w-20 h-20 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg shadow-blue-500/30 transform rotate-3 hover:rotate-6 transition">
+                <i class="fa-solid fa-graduation-cap" id="roleIcon"></i>
+            </div>
+        </div>
+
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Welcome Back!</h1>
+            <p class="text-gray-500 text-sm mt-1" id="roleText">Please login to continue learning</p>
+        </div>
+
+        <!-- Custom Toggle -->
+        <div class="relative bg-gray-100 p-1.5 rounded-xl flex mb-8 border border-gray-200">
+            <div class="absolute top-1.5 bottom-1.5 left-1.5 w-[calc(50%-6px)] bg-white rounded-lg shadow-sm toggle-bg" id="toggleIndicator"></div>
+            <button onclick="setRole('student')" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-gray-700 transition duration-300 hover:text-blue-600" id="btn-student">
+                Student
+            </button>
+            <button onclick="setRole('staff')" class="flex-1 relative z-10 py-2.5 text-sm font-bold text-gray-400 transition duration-300 hover:text-blue-600" id="btn-staff">
+                Staff
+            </button>
+        </div>
+
+        <form id="loginForm" class="space-y-5">
+            <div class="input-group relative">
+                <i class="fa-regular fa-user absolute left-4 top-4 text-gray-400"></i>
+                <input type="text" id="user" class="w-full pl-12 pr-4 py-3.5 bg-white/50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition font-medium text-gray-700 placeholder-gray-400" placeholder="Student Name" required>
+            </div>
+            
+            <div class="input-group relative">
+                <i class="fa-solid fa-lock absolute left-4 top-4 text-gray-400"></i>
+                <input type="password" id="pass" class="w-full pl-12 pr-4 py-3.5 bg-white/50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition font-medium text-gray-700 placeholder-gray-400" placeholder="••••••••" required>
+            </div>
+
+            <button class="w-full bg-gray-900 hover:bg-black text-white py-4 rounded-xl font-bold shadow-lg shadow-gray-900/20 hover:shadow-xl hover:-translate-y-1 transition duration-300 flex items-center justify-center gap-2 group">
+                <span id="btnText">Access Dashboard</span>
+                <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+            </button>
+        </form>
+
+        <p class="text-center text-xs text-gray-400 mt-6">Eng: Mohamed Mostafa &copy; 2026</p>
+    </div>
+
+    <script>
+        let currentRole = 'student';
+
+        function setRole(role) {
+            currentRole = role;
+            const toggle = document.getElementById('toggleIndicator');
+            const studentBtn = document.getElementById('btn-student');
+            const staffBtn = document.getElementById('btn-staff');
+            const userField = document.getElementById('user');
+            const icon = document.getElementById('roleIcon');
+            const text = document.getElementById('roleText');
+
+            if(role === 'student') {
+                toggle.style.transform = 'translateX(0)';
+                studentBtn.classList.replace('text-gray-400', 'text-gray-700');
+                staffBtn.classList.replace('text-gray-700', 'text-gray-400');
+                userField.placeholder = "Student Name";
+                icon.className = "fa-solid fa-graduation-cap";
+                text.innerText = "Please login to continue learning";
+            } else {
+                toggle.style.transform = 'translateX(100%)';
+                staffBtn.classList.replace('text-gray-400', 'text-gray-700');
+                studentBtn.classList.replace('text-gray-700', 'text-gray-400');
+                userField.placeholder = "Username";
+                icon.className = "fa-solid fa-chalkboard-user";
+                text.innerText = "Authorized personnel only";
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Verifying...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            const user = document.getElementById('user').value.trim();
+            const pass = document.getElementById('pass').value.trim();
+
+            try {
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=login&type=${currentRole}&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`);
+                const data = await res.json();
+
+                if(data.success) {
+                    sessionStorage.setItem('academyUser', JSON.stringify(data));
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
+                    btn.classList.replace('bg-gray-900', 'bg-green-600');
+                    
+                    setTimeout(() => {
+                        window.location.href = data.role === 'admin' ? 'admin.html' : (data.role === 'teacher' ? 'teacher.html' : 'dashboard.html');
+                    }, 800);
+                } else {
+                    throw new Error("Invalid");
+                }
+            } catch(err) {
+                btn.innerHTML = '<i class="fa-solid fa-xmark"></i> Failed';
+                btn.classList.replace('bg-gray-900', 'bg-red-600');
+                
+                // Shake Animation
+                const card = document.querySelector('.glass');
+                card.classList.add('animate-[shake_0.5s_ease-in-out]');
+                setTimeout(() => {
+                    card.classList.remove('animate-[shake_0.5s_ease-in-out]');
+                    btn.innerHTML = originalHTML;
+                    btn.classList.replace('bg-red-600', 'bg-gray-900');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }, 1500);
+            }
+        });
+    </script>
+    
+    <!-- Add Shake Keyframe for Tailwind config if needed, or inline style here -->
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</body>
+</html>
