@@ -211,22 +211,14 @@
                 </div>
             `).join('');
 
-            const cacheKey = `cache_${subj}_${user.grade}`;
-            const cachedData = sessionStorage.getItem(cacheKey);
-
-            if (cachedData) {
-                allMaterials = JSON.parse(cachedData);
+            try {
+                // ✅ تعديل احترافي: جلب البيانات مباشرة من السيرفر وإضافة تيمبستامب لمنع كاش المتصفح الداخلي نهائياً لضمان الفورية
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getContent&grade=${user.grade}&subject=${subj}&student=${encodeURIComponent(user.name)}&_=${new Date().getTime()}`);
+                allMaterials = await res.json();
                 renderCards(allMaterials);
-            } else {
-                try {
-                    const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getContent&grade=${user.grade}&subject=${subj}&student=${encodeURIComponent(user.name)}`);
-                    allMaterials = await res.json();
-                    sessionStorage.setItem(cacheKey, JSON.stringify(allMaterials));
-                    renderCards(allMaterials);
-                } catch(e) {
-                    console.error("Error loading content:", e);
-                    grid.innerHTML = `<div class="col-span-full py-20 text-center text-red-500 bg-white rounded-2xl shadow-sm border border-red-50"><i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i><p>عذراً، حدث خطأ أثناء تحميل البيانات. يرجى المحاولة مرة أخرى.</p></div>`;
-                }
+            } catch(e) {
+                console.error("Error loading content:", e);
+                grid.innerHTML = `<div class="col-span-full py-20 text-center text-red-500 bg-white rounded-2xl shadow-sm border border-red-50"><i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i><p>عذراً، حدث خطأ أثناء تحميل البيانات. يرجى المحاولة مرة أخرى.</p></div>`;
             }
         }
 
