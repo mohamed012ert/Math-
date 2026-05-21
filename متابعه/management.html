@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR BRAIN ACADEMY - Control Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #FAF8F0; }
+        .gradient-btn { background: linear-gradient(135deg, #F28749 0%, #51A3A3 100%); transition: all 0.3s ease; }
+        .gradient-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+        .stat-input { width: 100%; padding: 12px 16px; border-radius: 14px; border: 2px solid #E2E8F0; background-color: #F8FAFC; outline: none; transition: border-color 0.2s; }
+        .stat-input:focus { border-color: #51A3A3; background-color: white; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between" onload="initApp()">
+
+    <nav class="bg-white border-b border-orange-100 px-6 py-4 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-brain text-2xl" style="color: #F28749;"></i>
+                <span class="font-black text-gray-800 text-lg">MR BRAIN ACADEMY</span>
+            </div>
+            <div class="flex gap-2">
+                <button id="tabQuery" onclick="switchView('query')" class="px-4 py-2 bg-[#51A3A3] text-white rounded-lg font-bold text-sm transition-all">البحث عن طالب</button>
+                <button id="tabAdmin" onclick="switchView('admin')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-bold text-sm transition-all">لوحة الإدخال والجدول</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto p-6 flex-grow w-full">
+        
+        <div id="queryView" class="space-y-6 animate-fade-in">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute right-4 top-4 text-gray-400"></i>
+                    <input type="text" id="searchName" oninput="searchStudent()" placeholder="اكتب اسم الطالب للبحث الفوري والذكي..." class="stat-input pr-12">
+                </div>
+            </div>
+            
+            <div id="studentResultCard" class="hidden bg-white p-6 rounded-2xl shadow-md border border-gray-100 text-right space-y-6">
+                <div>
+                    <h3 id="resStudentName" class="font-black text-3xl text-gray-800 mb-1">-</h3>
+                    <span id="resStudentGrade" class="inline-block bg-orange-100 text-[#F28749] text-xs font-bold px-3 py-1 rounded-full">-</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                        <i class="fa-solid fa-user-slash text-red-500 mb-1"></i>
+                        <p class="text-red-500 text-xs font-bold">أيام الغياب</p>
+                        <p id="resAbsence" class="text-2xl font-black text-gray-800 mt-1">0</p>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                        <i class="fa-solid fa-book-open-reader text-orange-500 mb-1"></i>
+                        <p class="text-orange-500 text-xs font-bold">واجبات فائتة</p>
+                        <p id="resNoHomework" class="text-2xl font-black text-gray-800 mt-1">0</p>
+                    </div>
+                    <div class="bg-teal-50 p-4 rounded-xl border border-teal-100">
+                        <i class="fa-solid fa-star text-teal-600 mb-1"></i>
+                        <p class="text-teal-600 text-xs font-bold">مجموع النقاط</p>
+                        <p id="resPoints" class="text-2xl font-black text-gray-800 mt-1">0</p>
+                    </div>
+                </div>
+            </div>
+            <p id="searchMsg" class="text-center text-gray-400 font-bold mt-12">يرجى كتابة اسم الطالب للبحث في قاعدة البيانات الحية.</p>
+        </div>
+
+        <div id="adminView" class="hidden space-y-6">
+            <form id="studentForm" onsubmit="handleFormSubmit(event)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="sm:col-span-2">
+                    <label class="text-xs font-bold text-gray-600 block mb-1">اسم الطالب رباعي (سيقوم بالتحديث التلقائي لو الاسم مسجل مسبقاً)</label>
+                    <input type="text" id="inputName" required class="stat-input" placeholder="مثال: أحمد محمد علي">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">الجريد الدراسي (Grade)</label>
+                    <input type="text" id="inputGrade" required class="stat-input" placeholder="مثال: Grade 4">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">عدد مرات الغياب</label>
+                    <input type="number" id="inputAbsence" required min="0" class="stat-input" value="0">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">عدد مرات عدم تسليم الواجب</label>
+                    <input type="number" id="inputNoHomework" required min="0" class="stat-input" value="0">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-600 block mb-1">إجمالي البوينتس (Points)</label>
+                    <input type="number" id="inputPoints" required min="0" class="stat-input" value="0">
+                </div>
+                <button type="submit" id="submitBtn" class="sm:col-span-2 gradient-btn text-white font-bold py-3 rounded-xl mt-2 flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> <span>حفظ ومزامنة مع السيرفر</span>
+                </button>
+            </form>
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                    <h4 class="font-black text-gray-700">جميع السجلات في جوجل شيت</h4>
+                    <span id="studentCount" class="text-xs bg-gray-200 px-2 py-1 rounded font-bold text-gray-600">طلاب: 0</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse">
+                        <thead class="bg-gray-100/70 text-xs text-gray-500 border-b border-gray-100">
+                            <tr>
+                                <th class="p-3">اسم الطالب</th>
+                                <th class="p-3">الجريد</th>
+                                <th class="p-3 text-center">الغياب</th>
+                                <th class="p-3 text-center">بدون واجب</th>
+                                <th class="p-3 text-center">البوينت</th>
+                                <th class="p-3 text-center">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody" class="text-sm font-bold text-gray-700 divide-y divide-gray-100">
+                            <tr><td colspan="6" class="p-8 text-center text-gray-400">جاري تحميل البيانات من جوجل شيت...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white text-center py-4 border-t border-gray-100 text-xs font-bold text-gray-400">
+        MR BRAIN ACADEMY &copy; 2026 - All Rights Reserved
+    </footer>
+
+    <script>
+        let allStudents = [];
+
+        function initApp() {
+            // انتظار بسيط للتأكد من تحميل ملف الـ config خارجيًا
+            setTimeout(() => {
+                if (typeof GOOGLE_SCRIPT_URL !== 'undefined' && GOOGLE_SCRIPT_URL !== "") {
+                    loadStudents();
+                } else {
+                    showError("ملف config.js غير موجود أو لم يتم وضع رابط السيرفر بداخله بشكل صحيح.");
+                }
+            }, 400);
+        }
+
+        function switchView(view) {
+            const isQuery = view === 'query';
+            document.getElementById('queryView').classList.toggle('hidden', !isQuery);
+            document.getElementById('adminView').classList.toggle('hidden', isQuery);
+            
+            // تغيير ستايل الزراير النشطة
+            document.getElementById('tabQuery').className = isQuery ? "px-4 py-2 bg-[#51A3A3] text-white rounded-lg font-bold text-sm" : "px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-bold text-sm";
+            document.getElementById('tabAdmin').className = !isQuery ? "px-4 py-2 bg-[#51A3A3] text-white rounded-lg font-bold text-sm" : "px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-bold text-sm";
+        }
+
+        async function loadStudents() {
+            try {
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getStudents&_=${new Date().getTime()}`);
+                allStudents = await res.json();
+                document.getElementById('studentCount').innerText = "طلاب: " + allStudents.length;
+                renderTable();
+                // إعادة تفعيل البحث الفوري بالبيانات الجديدة المحدثة
+                searchStudent();
+            } catch(e) {
+                showError("خطأ في الاتصال بالسيرفر. تأكد من إعداد النشر على خيار (Anyone) ورفع الملف على Vercel أو استخدامه بمتصفح يدعم الطلبات المحلية.");
+            }
+        }
+
+        function showError(msg) {
+            const errorTemplate = `<span class='text-red-500 border border-red-200 bg-red-50 px-4 py-2 rounded-lg inline-block'>${msg}</span>`;
+            document.getElementById('searchMsg').innerHTML = errorTemplate;
+            document.getElementById('studentsTableBody').innerHTML = `<tr><td colspan="6" class="p-8 text-center">${errorTemplate}</td></tr>`;
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> جاري الحفظ والمزامنة...`;
+            
+            const payload = `action=saveStudent&name=${encodeURIComponent(document.getElementById('inputName').value)}&grade=${encodeURIComponent(document.getElementById('inputGrade').value)}&absence=${document.getElementById('inputAbsence').value}&noHomework=${document.getElementById('inputNoHomework').value}&points=${document.getElementById('inputPoints').value}`;
+            
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: payload
+                });
+                document.getElementById('studentForm').reset();
+                // إعادة تعيين القيم الافتراضية
+                document.getElementById('inputAbsence').value = 0;
+                document.getElementById('inputNoHomework').value = 0;
+                document.getElementById('inputPoints').value = 0;
+                
+                await loadStudents();
+                alert('تم الحفظ بنجاح ومزامنة الجدول الحالية!');
+            } catch(err) {
+                alert('حدث خطأ أثناء الاتصال بالسيرفر لحفظ البيانات.');
+            }
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>حفظ ومزامنة مع السيرفر</span>`;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('studentsTableBody');
+            if (allStudents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400">لا يوجد طلاب مسجلين حالياً في الشيت.</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = allStudents.map(s => `
+                <tr class="hover:bg-gray-50/80 transition-colors">
+                    <td class="p-3 font-bold text-gray-800">${s.name}</td>
+                    <td class="p-3 text-[#51A3A3]">${s.grade}</td>
+                    <td class="p-3 text-center text-red-500">${s.absence}</td>
+                    <td class="p-3 text-center text-orange-500">${s.noHomework}</td>
+                    <td class="p-3 text-center text-teal-600">${s.points}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="editLoad('${s.name}', '${s.grade}', ${s.absence}, ${s.noHomework}, ${s.points})" class="text-blue-500 hover:text-blue-700 ml-3" title="تعديل">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deleteStudent('${s.name}')" class="text-red-400 hover:text-red-600" title="حذف">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function editLoad(name, grade, absence, noHomework, points) {
+            document.getElementById('inputName').value = name;
+            document.getElementById('inputGrade').value = grade;
+            document.getElementById('inputAbsence').value = absence;
+            document.getElementById('inputNoHomework').value = noHomework;
+            document.getElementById('inputPoints').value = points;
+            switchView('admin');
+            document.getElementById('inputName').focus();
+        }
+
+        async function deleteStudent(name) {
+            if (confirm(`هل أنت متأكد تماماً من حذف الطالب "${name}" من قاعدة البيانات نهائياً؟`)) {
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `action=deleteStudent&name=${encodeURIComponent(name)}`
+                    });
+                    loadStudents();
+                } catch(e) {
+                    alert('خطأ أثناء محاولة الحذف.');
+                }
+            }
+        }
+
+        function searchStudent() {
+            const query = document.getElementById('searchName').value.trim().toLowerCase();
+            const card = document.getElementById('studentResultCard');
+            const msg = document.getElementById('searchMsg');
+            
+            if (!query) {
+                card.classList.add('hidden');
+                msg.classList.remove('hidden');
+                msg.innerText = "يرجى كتابة اسم الطالب للبحث في قاعدة البيانات الحية.";
+                return;
+            }
+            
+            // بحث مرن يبحث بالاسم أو جزء منه
+            const student = allStudents.find(s => s.name.toLowerCase().includes(query));
+            if (student) {
+                document.getElementById('resStudentName').innerText = student.name;
+                document.getElementById('resStudentGrade').innerText = "الجريد: " + student.grade;
+                document.getElementById('resAbsence').innerText = student.absence;
+                document.getElementById('resNoHomework').innerText = student.noHomework;
+                document.getElementById('resPoints').innerText = student.points;
+                card.classList.remove('hidden');
+                msg.classList.add('hidden');
+            } else {
+                card.classList.add('hidden');
+                msg.classList.remove('hidden');
+                msg.innerText = "لم يتم العثور على أي طالب متطابق مع هذا الاسم.";
+            }
+        }
+    </script>
+</body>
+</html>
