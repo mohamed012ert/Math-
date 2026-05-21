@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mr. Brain Academy | واجهة الطلاب</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandBg: '#FAF8F0',
+            brandOrange: '#F28749',
+            brandTeal: '#51A3A3',
+            brandDark: '#1E293B',
+          },
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Cairo', 'Outfit', sans-serif; background-color: #FAF8F0; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #51A3A3; }
+
+    /* تحسين القائمة الجانبية للموبايل */
+    @media (max-width: 1024px) {
+      .sidebar-responsive { transform: translateX(100%); transition: transform 0.3s ease; }
+      .sidebar-responsive.open { transform: translateX(0); }
+    }
+
+    /* إشعارات التنبيه (Toasts) */
+    .toast-container { position: fixed; top: 24px; left: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 12px; }
+    .toast { padding: 16px 24px; border-radius: 12px; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out; }
+    .toast .title { font-weight: 900; font-size: 15px; margin-bottom: 4px; }
+    .toast .desc { font-size: 12px; opacity: 0.9; }
+    .toast.success { background-color: #10B981; border-right: 4px solid #047857; }
+    .toast.error { background-color: #EF4444; border-right: 4px solid #B91C1C; }
+    .toast.warning { background-color: #F59E0B; border-right: 4px solid #B45309; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
+</head>
+<body class="h-screen overflow-hidden text-slate-700 font-cairo">
+
+<div class="fixed inset-0 bg-brandDark z-[99999] flex flex-col items-center justify-center transition-opacity duration-300" id="loadingScreen">
+  <div class="text-center animate-bounce">
+    <div class="text-4xl font-black text-white tracking-wider font-outfit">MR <span class="text-brandOrange">BRAIN</span></div>
+    <div class="text-xs text-brandTeal font-bold tracking-[0.3em] mt-1 font-outfit">ACADEMY</div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="flex h-screen w-full overflow-hidden">
+  
+  <nav class="sidebar-responsive w-72 bg-white border-l border-orange-100/40 h-full flex flex-col z-40 fixed lg:relative shadow-xl shadow-brandTeal/5" id="sidebar">
+    <div class="p-6 border-b border-orange-50/50 flex flex-col items-center text-center relative">
+      <button class="lg:hidden absolute top-4 left-4 text-slate-400 hover:text-red-500" onclick="document.getElementById('sidebar').classList.remove('open')">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+      <div class="w-20 h-20 rounded-full overflow-hidden ring-4 ring-brandOrange/20 mb-3 bg-brandBg flex items-center justify-center">
+        <img src="291873827_161657523091510_1933237999975051374_n.jpg" alt="Logo" class="object-cover w-full h-full" onerror="this.style.display='none'">
+      </div>
+      <div class="text-2xl font-black text-brandDark font-outfit">MR <span class="text-brandOrange">BRAIN</span></div>
+      <div class="text-[10px] text-brandTeal font-bold tracking-[0.2em] font-outfit">ACADEMY</div>
+    </div>
+    
+    <div class="flex-1 p-4 space-y-1.5 overflow-y-auto">
+      <div class="flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-brandTeal bg-teal-50 border-r-4 border-brandTeal cursor-pointer transition">
+        <i class="fa-solid fa-house-user text-lg"></i>
+        <span>الرئيسية (المدرسون)</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+    <header class="bg-white h-20 px-6 border-b border-orange-100/20 flex items-center justify-between shrink-0 shadow-sm z-30">
+      <div class="flex items-center gap-4">
+        <button class="lg:hidden w-10 h-10 rounded-xl bg-brandBg border border-orange-100/50 text-brandDark flex items-center justify-center text-xl" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <div class="text-lg font-black text-brandDark">نخبة المعلمين والخبراء</div>
+      </div>
+      <div class="flex items-center gap-2 text-xs font-bold bg-brandBg px-3 py-1.5 rounded-lg border border-orange-100/30 text-brandOrange">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> لوحة الطلاب
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6 space-y-8">
+      <div class="bg-gradient-to-br from-brandDark to-slate-800 p-8 rounded-2xl text-white relative overflow-hidden shadow-lg shadow-brandDark/10">
+        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-brandOrange/10 rounded-full blur-2xl"></div>
+        <div class="absolute -left-10 -top-10 w-40 h-40 bg-brandTeal/10 rounded-full blur-2xl"></div>
+        <h1 class="text-2xl md:text-3xl font-black text-white mb-2 relative z-10">مرحباً بك في أكاديمية Mr. Brain</h1>
+        <p class="text-slate-300 text-sm md:text-base max-w-2xl font-medium relative z-10">تصفح ملفات المدرسين، شاهد العروض، واحجز حصتك الفورية بلمسة واحدة</p>
+      </div>
+
+      <div class="flex flex-wrap gap-2.5 items-center border-b border-orange-100/20 pb-4" id="filtersContainer">
+        <button class="filter-btn bg-brandOrange text-white shadow-md border-brandOrange px-5 py-2.5 rounded-xl border font-bold text-sm transition" onclick="filterSubject('all', this)">كل المواد</button>
+        <button class="filter-btn bg-white text-slate-500 border-gray-200 hover:bg-gray-50 px-5 py-2.5 rounded-xl border font-bold text-sm transition" onclick="filterSubject('رياضيات', this)">الرياضيات</button>
+        <button class="filter-btn bg-white text-slate-500 border-gray-200 hover:bg-gray-50 px-5 py-2.5 rounded-xl border font-bold text-sm transition" onclick="filterSubject('فيزياء', this)">الفيزياء</button>
+        <button class="filter-btn bg-white text-slate-500 border-gray-200 hover:bg-gray-50 px-5 py-2.5 rounded-xl border font-bold text-sm transition" onclick="filterSubject('كيمياء', this)">الكيمياء</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="teachersGrid"></div>
+    </div>
+  </main>
+</div>
+
+<div class="hidden fixed inset-0 bg-brandDark/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 transition-all duration-300" id="bookingModal" onclick="if(event.target===this) closeModal()">
+  <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden border border-orange-100/20 flex flex-col">
+    <div class="p-6 bg-brandBg/60 border-b border-gray-100 flex items-center justify-between">
+      <h3 class="text-base md:text-lg font-black text-brandDark">
+        حجز حصة مع: <span id="modalTeacherName" class="text-brandOrange"></span>
+      </h3>
+      <button class="w-8 h-8 rounded-full flex items-center justify-center bg-white border border-gray-200 text-slate-400 hover:text-red-500 hover:bg-red-50 transition" onclick="closeModal()">✕</button>
+    </div>
+    
+    <div class="p-6 space-y-4">
+      <div class="space-y-1.5">
+        <label class="block text-xs font-black text-slate-500 uppercase">اسم الطالب بالكامل</label>
+        <input type="text" id="stu-name" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal focus:bg-white transition text-sm font-bold" placeholder="مثال: محمد مصطفى">
+      </div>
+      <div class="space-y-1.5">
+        <label class="block text-xs font-black text-slate-500 uppercase">رقم واتساب للمتابعة</label>
+        <input type="tel" id="stu-phone" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal focus:bg-white transition text-sm font-mono font-bold text-right" placeholder="01xxxxxxxxx">
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="space-y-1.5">
+          <label class="block text-xs font-black text-slate-500 uppercase">مكان الحصة</label>
+          <select id="stu-type" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal focus:bg-white transition text-sm font-bold text-slate-600">
+            <option value="Online">أونلاين مباشر (Online)</option>
+            <option value="Offline">السنتر المعتمد (Offline)</option>
+          </select>
+        </div>
+        <div class="space-y-1.5">
+          <label class="block text-xs font-black text-slate-500 uppercase">المرحلة الدراسية</label>
+          <select id="stu-grade" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal focus:bg-white transition text-sm font-bold text-slate-600">
+            <option>منهج مصري (عام/لغات)</option>
+            <option>American System</option>
+            <option>British System</option>
+          </select>
+        </div>
+      </div>
+      <button class="w-full bg-brandTeal hover:bg-brandOrange text-white py-4 rounded-xl font-black transition shadow-lg mt-2 flex items-center justify-center gap-2" id="confirmBtn" onclick="confirmBooking()">
+        <i class="fa-solid fa-paper-plane text-xs"></i> إرسال طلب الحجز الآن
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const loader = document.getElementById('loadingScreen');
+    if(loader) {
+      loader.classList.add('opacity-0', 'pointer-events-none');
+      setTimeout(() => loader.style.display = 'none', 300);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR BRAIN ACADEMY - Student Login</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="./Imag/2.jpg" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://script.google.com">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Cairo', 'Outfit', sans-serif; overflow: hidden; }
+        
+        /* Background Animation */
+        .bg-animate {
+            background: linear-gradient(-45deg, #FAF8F0, #F28749, #51A3A3, #FAF8F0);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            position: absolute; inset: 0; z-index: -1;
+        }
+        @keyframes gradient { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+
+        /* Glass Card */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(81, 163, 163, 0.15);
+        }
+
+        /* Gradient for Icon */
+        .gradient-icon {
+            background: linear-gradient(135deg, #F28749 0%, #51A3A3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-group { transition: all 0.3s ease; }
+        .input-group:focus-within { transform: translateY(-2px); }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen relative">
+
+    <div class="bg-animate"></div>
+    
+    <div class="absolute top-20 right-20 w-32 h-32 bg-white/20 rounded-full blur-2xl animate-pulse"></div>
+    <div class="absolute bottom-20 left-20 w-48 h-48 bg-[#51A3A3]/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
+    <div class="glass p-10 rounded-3xl w-full max-w-md relative z-10 transform hover:scale-[1.01] transition duration-500">
+        
+        <div class="flex flex-col items-center justify-center mb-6">
+            <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-3xl shadow-lg shadow-gray-200/50 transform rotate-3 hover:rotate-6 transition border border-gray-100">
+                <i class="fa-solid fa-brain gradient-icon" id="roleIcon"></i>
+            </div>
+            <p class="text-xs font-bold tracking-widest text-[#F28749] mt-3">MR BRAIN ACADEMY</p>
+        </div>
+
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800 tracking-tight">مرحباً بك مجدداً!</h1>
+            <p class="text-gray-500 text-sm mt-1" id="roleText">سجل دخولك لمتابعة رحلة تعلّمك</p>
+        </div>
+
+        <form id="loginForm" class="space-y-5">
+            <div class="input-group relative">
+                <i class="fa-regular fa-user absolute right-4 top-4 text-gray-400"></i>
+                <input type="text" id="user" class="w-full pr-12 pl-4 py-3.5 bg-white/50 border border-gray-200 rounded-xl focus:bg-white focus:border-[#51A3A3] focus:ring-4 focus:ring-[#51A3A3]/10 outline-none transition font-medium text-gray-700 placeholder-gray-400 text-right" placeholder="اسم الطالب (Student Name)" required>
+            </div>
+            
+            <div class="input-group relative">
+                <i class="fa-solid fa-lock absolute right-4 top-4 text-gray-400"></i>
+                <input type="password" id="pass" class="w-full pr-12 pl-4 py-3.5 bg-white/50 border border-gray-200 rounded-xl focus:bg-white focus:border-[#51A3A3] focus:ring-4 focus:ring-[#51A3A3]/10 outline-none transition font-medium text-gray-700 placeholder-gray-400 text-right" placeholder="كلمة المرور" required>
+            </div>
+
+            <button class="w-full bg-gray-900 hover:bg-black text-white py-4 rounded-xl font-bold shadow-lg shadow-gray-900/20 hover:shadow-xl hover:-translate-y-1 transition duration-300 flex items-center justify-center gap-2 group">
+                <span id="btnText">دخول لوحة الطالب</span>
+                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition"></i>
+            </button>
+        </form>
+
+        <p class="text-center text-xs text-gray-400 mt-6" dir="ltr">Eng: Mohamed Mostafa &copy; 2026</p>
+    </div>
+
+    <script>
+        // الدور الافتراضي والدائم هو الطالب الآن
+        const currentRole = 'student';
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> جاري التحقق من البيانات...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            const user = document.getElementById('user').value.trim();
+            const pass = document.getElementById('pass').value.trim();
+
+            try {
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=login&type=${currentRole}&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`);
+                const data = await res.json();
+
+                if(data.success) {
+                    sessionStorage.setItem('academyUser', JSON.stringify(data));
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> تم الدخول بنجاح!';
+                    btn.classList.replace('bg-gray-900', 'bg-green-600');
+                    
+                    setTimeout(() => {
+                        // سيتوجه الطالب مباشرة إلى صفحة الـ dashboard الخاصة بالطلاب
+                        window.location.href = 'dashboard.html';
+                    }, 800);
+                } else {
+                    throw new Error("Invalid");
+                }
+            } catch(err) {
+                btn.innerHTML = '<i class="fa-solid fa-xmark"></i> خطأ في الاسم أو كلمة المرور';
+                btn.classList.replace('bg-gray-900', 'bg-red-600');
+                
+                // Shake Animation في حالة الخطأ لتعطي تجربة تفاعلية
+                const card = document.querySelector('.glass');
+                card.classList.add('animate-[shake_0.5s_ease-in-out]');
+                setTimeout(() => {
+                    card.classList.remove('animate-[shake_0.5s_ease-in-out]');
+                    btn.innerHTML = originalHTML;
+                    btn.classList.replace('bg-red-600', 'bg-gray-900');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>

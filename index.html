@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الرئيسية - أكاديمية مستر برين</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandBg: '#FAF8F0', // الخلفية العاجية الفاتحة من الصورة
+                        brandOrange: '#F28749',
+                        brandTeal: '#51A3A3',
+                    },
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* كود مخصص لتطبيق التدرج اللوني على الأيقونات والنصوص مثل الصورة */
+        .gradient-text-icon {
+            background: linear-gradient(135deg, #F28749 0%, #51A3A3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(81, 163, 163, 0.1), 0 8px 10px -6px rgba(242, 135, 73, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-brandBg font-sans min-height-screen flex flex-col justify-between">
+
+    <header class="bg-white border-b border-gray-100 px-6 py-4 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-full border border-gray-100 p-1">
+                <i class="fa-solid fa-brain gradient-text-icon text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">لوحة التحكم الرئيسية</h1>
+                <p class="text-xs text-brandOrange font-semibold tracking-wider">MR BRAIN ACADEMY</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 bg-gray-50 py-1.5 px-4 rounded-full border border-gray-200">
+            <span class="text-sm font-semibold text-gray-700">مستر / المدير</span>
+            <div class="w-8 h-8 rounded-full bg-brandTeal flex items-center justify-center text-white text-sm">
+                <i class="fa-solid fa-user-gear"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12 flex-grow w-full flex items-center justify-center">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            
+            <a href="./Math--main-V-2/admin.html" class="bg-white border-2 border-gray-100 rounded-2xl p-8 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:border-brandTeal card-shadow group">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-sliders text-4xl gradient-text-icon"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">لوحة المشرف</h3>
+                <p class="text-sm text-gray-500">إدارة النظام، الإعدادات والصلاحيات بالكامل</p>
+            </a>
+
+            <a href="./Math--main-V-2/teacher.html" class="bg-white border-2 border-gray-100 rounded-2xl p-8 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:border-brandTeal card-shadow group">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-cloud-arrow-up text-4xl gradient-text-icon"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">رفع الملفات</h3>
+                <p class="text-sm text-gray-500">رفع المذكرات، الكتب، والمواد الدراسية</p>
+            </a>
+
+            <a href="./Math--main-V-2/index.html" class="bg-white border-2 border-gray-100 rounded-2xl p-8 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:border-brandTeal card-shadow group">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-graduation-cap text-4xl gradient-text-icon"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">بوابة الطلاب</h3>
+                <p class="text-sm text-gray-500">عرض بيانات الطلاب، درجاتهم وتقارير الأداء</p>
+            </a>
+
+            <a href="./حجز-مدرس/index.html" class="bg-white border-2 border-gray-100 rounded-2xl p-8 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:border-brandOrange card-shadow group">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                    <i class="fa-regular fa-calendar-check text-4xl gradient-text-icon"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">الحجز والمواعيد</h3>
+                <p class="text-sm text-gray-500">إدارة حجوزات المجموعات والحصص الجديدة</p>
+            </a>
+
+            <a href="./حجز-مدرس/admin.html" class="bg-white border-2 border-gray-100 rounded-2xl p-8 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:border-brandOrange card-shadow group">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-user-plus text-4xl gradient-text-icon"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">إضافة معلم</h3>
+                <p class="text-sm text-gray-500">تسجيل معلمين جدد وتعيينهم للمجموعات</p>
+            </a>
+
+            <a href="#" class="bg-white border-2 border-gray-100 rounded-2xl p-8 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:border-brandOrange card-shadow group">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-clipboard-user text-4xl gradient-text-icon"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">الواجب والغياب</h3>
+                <p class="text-sm text-gray-500">متابعة غياب الحصص وتصحيح الواجبات اليومية</p>
+            </a>
+
+        </div>
+    </main>
+
+    <footer class="text-center py-6 text-sm text-gray-400 border-t border-gray-100 bg-white">
+        حقوق النشر © 2026 أكاديمية <span class="text-brandOrange font-bold">Mr Brain</span>. جميع الحقوق محفوظة.
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+
+:root {
+  /* ألوان الهوية البصرية الكلاسيكية لـ Mr. Brain Academy */
+  --primary: #559E99;        /* الأزرق المخضر الراقٍ */
+  --primary-dark: #3F7A76;
+  --accent: #F08A5D;         /* البرتقالي الكورال الجذاب */
+  --accent-dark: #D97346;
+  --danger: #E63946;
+  --bg-main: #FDFBF7;        /* لون الخلفية الكلاسيكي الفاتح (بيج مريح جداً للعين) */
+  --bg-card: #FFFFFF;
+  --text-primary: #2B2D42;
+  --text-secondary: #6D6875;
+  --border: #E5E0D8;
+  --radius: 12px;
+  --shadow: 0 6px 20px rgba(85, 158, 153, 0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+body { background: var(--bg-main); color: var(--text-primary); overflow-x: hidden; }
+
+/* الهيكل العام للموقع Layout */
+.app-shell { display: flex; min-height: 100vh; }
+.sidebar { width: 270px; background: #FFFFFF; border-left: 1px solid var(--border); padding: 30px 20px; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.01); z-index: 10; }
+.sidebar-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; flex-direction: column; text-align: center; }
+.logo-img { width: 85px; height: auto; border-radius: 50%; }
+.logo-text { font-weight: 900; font-size: 22px; color: var(--accent); margin-top: 5px; text-transform: uppercase; }
+.logo-text span { color: var(--primary); }
+.logo-sub { font-size: 12px; color: var(--text-secondary); font-weight: 700; letter-spacing: 1.5px; margin-top: -4px; }
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; color: var(--text-secondary); border-radius: 8px; cursor: pointer; text-decoration: none; font-size: 15px; font-weight: 700; transition: all .3s ease; }
+.nav-item:hover, .nav-item.active { background: rgba(85, 158, 153, 0.08); color: var(--primary); border-right: 4px solid var(--primary); }
+
+.main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.topbar { background: var(--bg-card); height: 75px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 35px; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.01); }
+.page-title { font-weight: 700; font-size: 20px; color: var(--primary-dark); }
+.menu-btn { display: none; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--primary); }
+.page-wrap { padding: 35px; flex: 1; }
+
+/* البانر الترحيبي Hero */
+.hero { background: linear-gradient(135deg, rgba(85,158,153,0.07), rgba(240,138,93,0.07)); border: 1px solid var(--border); padding: 35px; border-radius: var(--radius); margin-bottom: 35px; text-align: center; }
+.hero-title { font-size: 26px; font-weight: 900; color: var(--primary-dark); margin-bottom: 8px; }
+.hero-subtitle { font-size: 15px; color: var(--text-secondary); font-weight: 600; }
+
+/* أزرار الفلترة */
+.filter-bar { display: flex; gap: 12px; margin-bottom: 35px; justify-content: center; flex-wrap: wrap; }
+.filter-btn { background: #FFFFFF; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 24px; border-radius: 30px; cursor: pointer; font-weight: 700; font-size: 14px; transition: .3s; }
+.filter-btn.active, .filter-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(85,158,153,0.25); }
+
+/* شبكة عرض كروت المدرسين */
+.teachers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+.card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: .3s cubic-bezier(0.4, 0, 0.2, 1); }
+.card-box:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(85,158,153,0.12); border-color: var(--primary); }
+.card-box-header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: rgba(85,158,153,0.03); }
+.card-box-title { font-weight: 700; font-size: 16px; color: var(--primary-dark); }
+.card-box-body { padding: 25px; }
+
+/* تصميم الهيدر الداخلي للكارت (الصورة والبيانات الأساسية) */
+.teacher-profile-header { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+.avatar-container { width: 70px; height: 70px; position: relative; flex-shrink: 0; }
+.teacher-avatar { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 2.5px solid var(--primary); padding: 2px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.avatar-fallback { width: 100%; height: 100%; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 26px; border: 2.5px solid var(--border); }
+.teacher-meta { display: flex; flex-direction: column; gap: 4px; }
+.teacher-title-name { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.badge-subject { background: rgba(240,138,93,0.12); color: var(--accent-dark); padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; width: max-content; }
+.teacher-description { font-size: 13px; color: var(--text-secondary); line-height: 1.6; min-height: 48px; margin-bottom: 15px; }
+
+/* صندوق استعراض الفيديو المصغر الذكي (YouTube Thumbnail Preview) */
+.video-preview-box { width: 100%; height: 145px; border-radius: 10px; overflow: hidden; position: relative; margin: 15px 0; background: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.video-link-wrapper { display: block; width: 100%; height: 100%; position: relative; }
+.video-thumb { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: all 0.4s ease; }
+.video-link-wrapper:hover .video-thumb { transform: scale(1.04); opacity: 0.95; }
+.video-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 2px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.3); transition: all 0.3s ease; }
+.play-icon { color: #fff; font-size: 16px; margin-left: -2px; transition: transform 0.3s ease; }
+.video-link-wrapper:hover .video-play-btn { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 15px rgba(85, 158, 153, 0.6); transform: translate(-50%, -50%) scale(1.1); }
+
+/* صف الإحصائيات والمعلومات السفلية لكارت المدرس */
+.info-row { display: flex; justify-content: space-between; align-items: center; background: #FDFBF7; border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 18px; font-size: 13px; font-weight: 700; }
+.price-tag { color: var(--primary-dark); font-weight: 900; }
+
+/* حقول الإدخال واللوائح والمستندات في الإدارة والحجز */
+.form-group { margin-bottom: 18px; text-align: right; }
+.form-label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--primary-dark); }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text-primary); background: #FDFBF7; outline: none; transition: .3s; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(85, 158, 153, 0.1); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+/* الأزرار المحترفة */
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; border: none; transition: .3s; text-decoration: none; gap: 8px; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 15px rgba(85, 158, 153, 0.35); }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover { background: var(--accent-dark); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 6px; }
+
+/* جداول لوحة التحكم */
+table { width: 100%; border-collapse: collapse; text-align: right; font-size: 14px; background: #fff; }
+th, td { padding: 15px 20px; border-bottom: 1px solid var(--border); }
+th { font-weight: 700; color: var(--primary-dark); background: rgba(85, 158, 153, 0.04); }
+td img.table-img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
+
+/* نوافذ الحجز المنبثقة Modals */
+.modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(43, 45, 66, 0.6); display:none; align-items:center; justify-content:center; padding:20px; z-index:1000; backdrop-filter: blur(5px); }
+.modal-overlay.open { display: flex; }
+.modal { background: #fff; border-radius: var(--radius); width: 100%; max-width: 520px; overflow: hidden; animation: slideUp .4s cubic-bezier(0.175, 0.885, 0.32, 1.1); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+.modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #FDFBF7; }
+.modal-title { font-size: 16px; font-weight: 700; }
+
+/* شاشات التحميل التلقائية والإشعارات */
+.loading-screen { position: fixed; top:0; left:0; right:0; bottom:0; background: var(--bg-main); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.loading-screen.gone { display: none; }
+.toast-container { position: fixed; bottom: 25px; left: 25px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+.toast { background: #2B2D42; color: #fff; padding: 15px 25px; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); font-size: 14px; animation: slideIn .3s ease; border-right: 4px solid var(--primary); }
+.toast.success { border-right-color: var(--accent); }
+.toast.error { border-right-color: var(--danger); }
+
+@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes slideIn { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* التوافقية مع شاشات الهواتف المحمولة */
+@media (max-width: 768px) {
+  .app-shell { flex-direction: column; }
+  .sidebar { width: 100%; position: fixed; top: 75px; bottom: 0; left: 0; transform: translateX(100%); z-index: 999; transition: .3s; border-left: none; box-shadow: -4px 0 15px rgba(0,0,0,0.05); }
+  .sidebar.open { transform: translateX(0); }
+  .menu-btn { display: block; }
+}

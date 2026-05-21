@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR Brain | Admin Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="./Imag/2.jpg" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://script.google.com">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandBg: '#FAF8F0',
+                        brandOrange: '#F28749',
+                        brandTeal: '#51A3A3',
+                        brandDark: '#1E293B',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Outfit', 'Cairo', sans-serif; background-color: #FAF8F0; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #51A3A3; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #F28749 0%, #51A3A3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .student-tag {
+            transition: all 0.2s ease;
+            position: relative;
+            padding-right: 26px;
+        }
+        .student-tag:hover {
+            background-color: #fee2e2;
+            color: #ef4444;
+            border-color: #fca5a5;
+            cursor: pointer;
+        }
+        .student-tag::after {
+            content: "\f00d";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .student-tag:hover::after { opacity: 1; }
+
+        .nav-item.active { 
+            background: linear-gradient(90deg, rgba(81, 163, 163, 0.1) 0%, transparent 100%); 
+            color: #51A3A3; 
+            border-left: 4px solid #51A3A3; 
+        }
+
+        /* أنيميشن تحميل العمليات المتطور */
+        .spinner-ring {
+            border: 4px solid rgba(81, 163, 163, 0.1);
+            border-top: 4px solid #F28749;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* أنيميشن الهياكل المحدثة بلون البراند */
+        .skeleton {
+            background: linear-gradient(90deg, #f4f2ea 25%, #eadecc 50%, #f4f2ea 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden text-slate-700">
+
+    <div id="operationLoader" class="hidden fixed inset-0 bg-brandDark/70 backdrop-blur-md z-[100000] flex flex-col items-center justify-center text-white transition-opacity duration-300">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl flex flex-col items-center border border-gray-100 max-w-xs w-full">
+            <div class="spinner-ring mb-4"></div>
+            <p id="loaderText" class="text-brandDark font-bold text-sm text-center">Processing Request...</p>
+        </div>
+    </div>
+
+    <div id="lockScreen" class="fixed inset-0 z-[99] bg-brandDark flex flex-col items-center justify-center text-white transition-opacity duration-500">
+        <div class="bg-slate-800/40 backdrop-blur-xl p-10 rounded-3xl shadow-2xl w-full max-w-sm text-center border border-slate-700/50 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brandOrange to-brandTeal"></div>
+            <div class="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 ring-4 ring-brandOrange/30">
+                <i class="fa-solid fa-fingerprint text-4xl text-brandOrange"></i>
+            </div>
+            <h2 class="text-3xl font-bold mb-2 tracking-tight">Admin Access</h2>
+            <p class="text-slate-400 text-sm mb-8">MR Brain Smart Dashboard</p>
+            <form onsubmit="unlock(event)" class="relative">
+                <input type="password" id="masterKey" class="w-full px-5 py-4 bg-brandDark border border-slate-600 rounded-xl outline-none text-center tracking-[0.5em] text-xl transition focus:border-brandTeal focus:ring-1 focus:ring-brandTeal placeholder-slate-600" placeholder="••••" required>
+                <button class="absolute right-2 top-2 bottom-2 bg-brandTeal hover:bg-brandOrange text-white px-4 rounded-lg transition shadow-md"><i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+            <p id="errorMsg" class="text-red-400 text-xs mt-4 font-bold hidden animate-pulse">⛔ Access Denied</p>
+        </div>
+    </div>
+
+    <div id="mainPanel" class="hidden w-full h-full flex">
+        
+        <aside class="w-72 bg-white border-r border-orange-100/40 flex flex-col z-20 shadow-xl shadow-brandTeal/5">
+            <div class="h-24 flex items-center px-8 border-b border-orange-50/50">
+                <div class="w-10 h-10 bg-gradient-to-br from-brandOrange to-brandTeal rounded-xl flex items-center justify-center text-white mr-3 shadow-lg shadow-brandOrange/20"><i class="fa-solid fa-brain"></i></div>
+                <h1 class="font-black text-lg tracking-tight text-brandDark">MR Brain <span class="gradient-text">Admin</span></h1>
+            </div>
+            
+            <nav class="flex-1 p-5 space-y-2">
+                <button onclick="view('classes')" id="btn-classes" class="nav-item active w-full text-left px-5 py-4 rounded-xl font-bold text-slate-500 hover:bg-brandBg/60 transition flex items-center gap-4">
+                    <i class="fa-solid fa-chalkboard-user text-lg w-6"></i> Classrooms & Staff
+                </button>
+                <button onclick="view('teachers')" id="btn-teachers" class="nav-item w-full text-left px-5 py-4 rounded-xl font-bold text-slate-500 hover:bg-brandBg/60 transition flex items-center gap-4">
+                    <i class="fa-solid fa-user-plus text-lg w-6"></i> Add Teachers
+                </button>
+                <button onclick="view('students')" id="btn-students" class="nav-item w-full text-left px-5 py-4 rounded-xl font-bold text-slate-500 hover:bg-brandBg/60 transition flex items-center gap-4">
+                    <i class="fa-solid fa-graduation-cap text-lg w-6"></i> Students Directory
+                </button>
+            </nav>
+
+            <div class="p-6 border-t border-orange-50/50">
+                <a href="../index.html" class="flex items-center justify-center gap-3 text-red-500 font-bold bg-red-50/60 py-3 rounded-xl hover:bg-red-100/80 transition shadow-sm border border-red-100/50"><i class="fa-solid fa-power-off"></i> Logout Dashboard</a>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto p-8 relative">
+            
+            <div id="view-classes" class="max-w-7xl mx-auto">
+                <header class="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl border border-orange-100/30 shadow-sm">
+                    <div>
+                        <h2 class="text-2xl font-black text-brandDark">Classrooms Management</h2>
+                        <p class="text-slate-400 text-sm mt-1">Manage teacher assignments and student rosters.</p>
+                    </div>
+                    <button onclick="loadData()" class="bg-white border border-gray-200 text-brandTeal px-5 py-2.5 rounded-xl font-bold shadow-sm hover:bg-brandBg transition flex items-center gap-2"><i class="fa-solid fa-rotate"></i> Refresh System</button>
+                </header>
+
+                <div id="classesGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="col-span-full text-center py-20 text-slate-400 animate-pulse">Loading System Data...</div>
+                </div>
+            </div>
+
+            <div id="view-teachers" class="hidden max-w-5xl mx-auto">
+                <h2 class="text-2xl font-black text-brandDark mb-6">Staff Management</h2>
+                
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-orange-100/20 mb-8">
+                    <h3 class="font-bold text-lg mb-6 flex items-center gap-3 text-brandTeal">
+                        <span class="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center text-sm text-brandTeal"><i class="fa-solid fa-plus"></i></span> Create New Teacher Account
+                    </h3>
+                    <form id="addTeacherForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <input id="tName" placeholder="Full Name (e.g. Mr. Ahmed)" class="p-4 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal focus:bg-white transition" required>
+                        <input id="tPass" placeholder="Login Password" class="p-4 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal focus:bg-white transition" required>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase mb-3 ml-1">Assigned Academic Subject</label>
+                            <div class="flex gap-4">
+                                <label class="flex-1 cursor-pointer"><input type="radio" name="subj" value="Math" checked class="peer sr-only"><div class="text-center py-3 rounded-xl border-2 border-gray-100 peer-checked:border-brandOrange peer-checked:bg-orange-50/60 peer-checked:text-brandOrange font-bold text-slate-500 transition hover:bg-gray-50">Mathematics</div></label>
+                                <label class="flex-1 cursor-pointer"><input type="radio" name="subj" value="Science" class="peer sr-only"><div class="text-center py-3 rounded-xl border-2 border-gray-100 peer-checked:border-brandTeal peer-checked:bg-teal-50/60 peer-checked:text-brandTeal font-bold text-slate-500 transition hover:bg-gray-50">Science / Physics</div></label>
+                                <label class="flex-1 cursor-pointer"><input type="radio" name="subj" value="English" class="peer sr-only"><div class="text-center py-3 rounded-xl border-2 border-gray-100 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-600 font-bold text-slate-500 transition hover:bg-gray-50">English Package</div></label>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-black text-slate-400 uppercase mb-3 ml-1">Allowed Educational Grades</label>
+                            <div class="grid grid-cols-9 gap-2" id="gradeBoxes"></div>
+                        </div>
+
+                        <button class="md:col-span-2 bg-brandDark hover:bg-brandOrange text-white py-4 rounded-xl font-bold transition shadow-lg mt-2">Register Teacher Data</button>
+                    </form>
+                </div>
+
+                <h3 class="font-black text-slate-400 uppercase text-xs mb-4 tracking-wider">Active Staff Database</h3>
+                <div id="staffList" class="grid gap-3"></div>
+            </div>
+
+            <div id="view-students" class="hidden max-w-6xl mx-auto">
+                <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl border border-orange-100/30 shadow-sm">
+                    <div>
+                        <h2 class="text-2xl font-black text-brandDark">Student Directory</h2>
+                        <p class="text-slate-400 text-sm">Total registered students configuration pool.</p>
+                    </div>
+                    <button onclick="document.getElementById('addStudentModal').classList.remove('hidden')" class="bg-brandTeal text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-brandTeal/20 hover:bg-brandOrange transition flex items-center gap-2"><i class="fa-solid fa-plus"></i> Add Student</button>
+                </header>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-brandBg/60 border-b border-gray-100 text-xs uppercase text-slate-400 font-black">
+                            <tr><th class="p-5">Student Name</th><th class="p-5">Academic Grade</th><th class="p-5">Password</th><th class="p-5 text-right">System Action</th></tr>
+                        </thead>
+                        <tbody id="studentsList" class="divide-y divide-gray-50 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="assignModal" class="hidden fixed inset-0 bg-brandDark/60 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-white w-[500px] max-h-[80vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="assignModalContent">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-brandBg/40">
+                <div>
+                    <h3 class="font-black text-lg text-brandDark">Add Students to Classroom</h3>
+                    <p class="text-xs text-slate-400">Assigning to <span id="modalTName" class="text-brandOrange font-bold">...</span></p>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-2 bg-white" id="checklist"></div>
+            <div class="p-5 border-t border-gray-100 bg-brandBg/40 flex gap-3">
+                <button onclick="closeModal()" class="flex-1 py-3 rounded-xl font-bold text-slate-500 hover:bg-gray-200/60 transition">Cancel</button>
+                <button onclick="saveAssignment()" class="flex-1 py-3 rounded-xl font-bold text-white bg-brandTeal hover:bg-brandOrange transition shadow-lg">Confirm System Add</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addStudentModal" class="hidden fixed inset-0 bg-brandDark/60 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl w-96 shadow-2xl border border-gray-50">
+            <h3 class="text-xl font-black mb-6 text-brandDark">Register Student</h3>
+            <form id="addStudentForm" class="space-y-4">
+                <input id="sName" placeholder="Student Full Name" class="w-full p-3.5 border rounded-xl bg-brandBg/40 focus:bg-white outline-none focus:border-brandTeal" required>
+                <input id="sPass" placeholder="Login Security Password" class="w-full p-3.5 border rounded-xl bg-brandBg/40 focus:bg-white outline-none focus:border-brandTeal" required>
+                <select id="sGrade" class="w-full p-3.5 border rounded-xl bg-brandBg/40 focus:bg-white outline-none font-bold text-slate-600"><script>for(let i=1;i<=9;i++)document.write(`<option value="${i}">Grade ${i}</option>`)</script></select>
+                <button class="w-full bg-brandTeal text-white py-3.5 rounded-xl font-bold hover:bg-brandOrange transition shadow-lg mt-2">Secure Register Student</button>
+            </form>
+            <button onclick="document.getElementById('addStudentModal').classList.add('hidden')" class="w-full mt-4 text-slate-400 text-xs font-bold hover:text-slate-600 transition">Dismiss View</button>
+        </div>
+    </div>
+
+    <script>
+        const MASTER_PASS = "admin123";
+        let teachersData = [], studentsData = [];
+        let currentTeacher = "";
+
+        // دوال التحكم بمؤشر التحميل العام للعمليات الفورية
+        function showLoader(message) {
+            document.getElementById('loaderText').innerText = message || "Processing request...";
+            document.getElementById('operationLoader').classList.remove('hidden');
+        }
+        function hideLoader() {
+            document.getElementById('operationLoader').classList.add('hidden');
+        }
+
+        function unlock(e) { e.preventDefault(); if(document.getElementById('masterKey').value===MASTER_PASS){document.getElementById('lockScreen').style.opacity='0'; setTimeout(()=>{document.getElementById('lockScreen').style.display='none';document.getElementById('mainPanel').classList.remove('hidden');init();},500);}else{document.getElementById('errorMsg').classList.remove('hidden');}}
+
+        async function init() {
+            const gb = document.getElementById('gradeBoxes');
+            gb.innerHTML = ""; // Clear to prevent double render
+            for(let i=1;i<=9;i++) gb.innerHTML+=`<label class="cursor-pointer text-center"><input type="checkbox" value="${i}" class="peer sr-only"><div class="border border-gray-200 rounded-xl py-2.5 hover:bg-brandBg peer-checked:bg-brandTeal peer-checked:text-white peer-checked:border-brandTeal transition text-sm font-bold shadow-sm">${i}</div></label>`;
+            await loadData();
+        }
+
+        async function loadData() {
+            const grid = document.getElementById('classesGrid');
+            
+            // ✅ تطبيق الـ Skeleton Loader الفخم عند جلب البيانات الكلية للنظام
+            grid.innerHTML = Array(3).fill(0).map(() => `
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div class="space-y-2 w-1/2">
+                            <div class="h-4 skeleton rounded-md w-full"></div>
+                            <div class="h-2.5 skeleton rounded-md w-1/2"></div>
+                        </div>
+                        <div class="w-8 h-8 rounded-full skeleton"></div>
+                    </div>
+                    <div class="h-20 skeleton rounded-xl w-full"></div>
+                    <div class="h-10 skeleton rounded-xl w-full mt-4"></div>
+                </div>
+            `).join('');
+
+            try {
+                const [teachersRes, studentsRes] = await Promise.all([
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getTeachers`),
+                    fetch(`${GOOGLE_SCRIPT_URL}?action=getAllStudents`)
+                ]);
+                
+                teachersData = await teachersRes.json();
+                studentsData = await studentsRes.json();
+                
+                renderClasses(); renderTeachers(); renderStudents();
+            } catch(e) { 
+                console.error("Error fetching admin data:", e); 
+                grid.innerHTML = "<p class='col-span-full text-center text-red-400 font-bold'>Error connection. Please refresh again.</p>";
+            }
+        }
+
+        function renderClasses() {
+            const grid = document.getElementById('classesGrid');
+            if(!teachersData.length) { grid.innerHTML = "<p class='col-span-full text-center text-slate-400 font-bold py-10 bg-white rounded-2xl border border-gray-100'>No active classes found inside sheet database.</p>"; return; }
+
+            grid.innerHTML = teachersData.map(t => {
+                let assigned = []; try { assigned = JSON.parse(t.assignedStudents); } catch(e){}
+                
+                let tags = assigned.map(s => `
+                    <span onclick="removeStudent('${t.name}', '${s}')" class="student-tag inline-flex items-center bg-brandBg border border-orange-100/60 text-brandDark text-[11px] px-2.5 py-1 rounded-lg font-bold mb-1.5 mr-1.5" title="Click to delete student">
+                        ${s}
+                    </span>`).join('');
+                
+                if(!tags) tags = "<span class='text-xs text-slate-400 italic pl-1'>No students configured yet.</span>";
+
+                return `
+                <div class="bg-white p-6 rounded-2xl border border-orange-100/20 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col h-full border-t-4 border-t-brandTeal">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-brandDark">${t.name}</h3>
+                            <span class="bg-orange-50/60 text-brandOrange border border-orange-100 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider">${t.subject}</span>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-brandBg flex items-center justify-center font-bold text-xs text-brandTeal border border-orange-100/30">${assigned.length}</div>
+                    </div>
+                    
+                    <div class="flex-1 mb-4 bg-brandBg/30 rounded-xl p-3 border border-gray-50 overflow-y-auto max-h-32">
+                        <p class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-wider">Class Roster (Click element to remove)</p>
+                        ${tags}
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-50 mt-auto">
+                        <p class="text-[10px] text-slate-400 mb-3 font-bold uppercase"><i class="fa-solid fa-layer-group mr-1 text-brandOrange"></i> Grades Scope: ${JSON.parse(t.grades).join(', ')}</p>
+                        <button onclick="openAssign('${t.name}')" class="w-full py-2.5 rounded-xl bg-brandDark text-white font-bold text-sm hover:bg-brandTeal transition shadow-md">
+                            <i class="fa-solid fa-user-plus mr-2"></i> Add Student List
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function openAssign(name) {
+            currTeacher = name;
+            document.getElementById('modalTName').innerText = name;
+            document.getElementById('assignModal').classList.remove('hidden');
+            setTimeout(()=>document.getElementById('assignModalContent').classList.remove('scale-95'),10);
+
+            const teacher = teachersData.find(t => t.name === name);
+            const allowed = JSON.parse(teacher.grades).map(String);
+            const current = teacher.assignedStudents ? JSON.parse(teacher.assignedStudents) : [];
+            
+            const eligible = studentsData.filter(s => allowed.includes(String(s.grade)) && !current.includes(s.name));
+
+            document.getElementById('checklist').innerHTML = eligible.length ? eligible.map(s => `
+                <label class="flex items-center gap-3 p-3.5 hover:bg-brandBg cursor-pointer border-b border-gray-50 last:border-0 transition group">
+                    <input type="checkbox" value="${s.name}" class="st-cb w-5 h-5 rounded border-gray-300 text-brandTeal focus:ring-brandTeal">
+                    <div class="flex-1 flex justify-between">
+                        <span class="font-bold text-slate-700 group-hover:text-brandTeal">${s.name}</span>
+                        <span class="text-[10px] bg-white border border-gray-200 px-2 py-0.5 rounded font-black text-slate-400">G${s.grade}</span>
+                    </div>
+                </label>`).join('') : '<div class="text-center p-10 text-slate-400 flex flex-col items-center"><i class="fa-solid fa-check-circle text-3xl mb-2 text-emerald-400"></i><p class="font-bold text-sm">All eligible grade students allocated.</p></div>';
+        }
+
+        async function saveAssignment() {
+            const selected = Array.from(document.querySelectorAll('.st-cb:checked')).map(c => c.value);
+            if(selected.length === 0) return alert("Select at least one student!");
+
+            showLoader("Saving new assignments to sheet database...");
+            const teacher = teachersData.find(t => t.name === currTeacher);
+            const oldList = teacher.assignedStudents ? JSON.parse(teacher.assignedStudents) : [];
+            const newList = [...oldList, ...selected]; 
+
+            await fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', body:JSON.stringify({
+                action:"assignStudents", teacherName:currTeacher, studentsList:newList
+            })});
+            
+            closeModal();
+            await loadData();
+            hideLoader();
+        }
+
+        async function removeStudent(tName, sName) {
+            if(!confirm(`Remove student ${sName} from this configured class?`)) return;
+            
+            showLoader(`Removing student ${sName} from teacher profile...`);
+            const teacher = teachersData.find(t => t.name === tName);
+            const oldList = JSON.parse(teacher.assignedStudents);
+            const newList = oldList.filter(s => s !== sName); 
+
+            await fetch(GOOGLE_SCRIPT_URL, { method:'POST', mode:'no-cors', body:JSON.stringify({
+                action:"assignStudents", teacherName:tName, studentsList:newList
+            })});
+            await loadData();
+            hideLoader();
+        }
+
+        function renderTeachers() {
+            document.getElementById('staffList').innerHTML = teachersData.map(t => 
+                `<div class="flex justify-between items-center p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-brandTeal/40 transition">
+                    <div><h4 class="font-bold text-brandDark">${t.name}</h4><p class="text-xs text-slate-400 font-medium">${t.subject} • Security Key: ${t.pass}</p></div>
+                    <button onclick="del('${t.name}','teacher')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2.5 rounded-xl transition"><i class="fa-solid fa-trash-can"></i></button>
+                </div>`).join('');
+        }
+        
+        function renderStudents() {
+            document.getElementById('studentsList').innerHTML = studentsData.map(s => 
+                `<tr class="hover:bg-brandBg/40 transition border-b last:border-0 border-gray-50">
+                    <td class="p-5 font-bold text-slate-700">${s.name}</td>
+                    <td class="p-5"><span class="bg-brandBg border border-orange-100/40 text-brandTeal text-xs px-2.5 py-1 rounded-lg font-black">G${s.grade}</span></td>
+                    <td class="p-5 font-mono text-xs text-slate-400 font-bold">${s.pass}</td>
+                    <td class="p-5 text-right"><button onclick="del('${s.name}','student')" class="text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition"><i class="fa-solid fa-trash-can"></i></button></td>
+                </tr>`).join('');
+        }
+
+        document.getElementById('addTeacherForm').addEventListener('submit', async (e)=>{ 
+            e.preventDefault(); 
+            const grades = Array.from(document.querySelectorAll('#gradeBoxes input:checked')).map(c=>c.value); 
+            if(!grades.length) return alert("Select at least one grade scope!"); 
+            
+            showLoader("Creating global teacher security account...");
+            await fetch(GOOGLE_SCRIPT_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:"addTeacher", name:document.getElementById('tName').value, pass:document.getElementById('tPass').value, subject:document.querySelector('input[name="subj"]:checked').value, grades})}); 
+            
+            e.target.reset(); 
+            await loadData(); 
+            hideLoader();
+            init(); // Re-render grade checkboxes state
+        });
+        
+        document.getElementById('addStudentForm').addEventListener('submit', async (e)=>{ 
+            e.preventDefault(); 
+            
+            showLoader("Inserting new student row configuration...");
+            await fetch(GOOGLE_SCRIPT_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:"addStudent", name:document.getElementById('sName').value, pass:document.getElementById('sPass').value, grade:document.getElementById('sGrade').value})}); 
+            
+            document.getElementById('addStudentModal').classList.add('hidden'); 
+            e.target.reset(); 
+            await loadData(); 
+            hideLoader();
+        });
+        
+        async function del(n,r) { 
+            if(!confirm(`Are you completely sure you want to delete this ${r}?`)) return; 
+            
+            showLoader(`Purging ${r} data completely from servers...`);
+            await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify({action:"deleteUser",name:n,role:r})}); 
+            await loadData(); 
+            hideLoader();
+        }
+        
+        function closeModal() { document.getElementById('assignModal').classList.add('hidden'); document.getElementById('assignModalContent').classList.add('scale-95'); }
+        function view(v) { ['classes','teachers','students'].forEach(id=>{document.getElementById(`view-${id}`).classList.add('hidden'); document.getElementById(`btn-${id}`).classList.remove('active');}); document.getElementById(`view-${v}`).classList.remove('hidden'); document.getElementById(`btn-${v}`).classList.add('active'); }
+    </script>
+</body>
+</html>

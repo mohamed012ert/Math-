@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mr. Brain Academy | لوحة الإشراف</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brandBg: '#FAF8F0', brandOrange: '#F28749', brandTeal: '#51A3A3', brandDark: '#1E293B' },
+          fontFamily: { cairo: ['Cairo', 'sans-serif'], outfit: ['Outfit', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Cairo', 'Outfit', sans-serif; background-color: #FAF8F0; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .toast-container { position: fixed; bottom: 24px; left: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 12px; }
+    .toast { padding: 16px 24px; border-radius: 12px; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: slideUp 0.3s ease-out; }
+    .toast .title { font-weight: 900; font-size: 15px; margin-bottom: 4px; }
+    .toast .desc { font-size: 12px; opacity: 0.9; }
+    .toast.success { background-color: #10B981; border-right: 4px solid #047857; }
+    .toast.error { background-color: #EF4444; border-right: 4px solid #B91C1C; }
+    @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body class="h-screen overflow-hidden text-slate-700 font-cairo">
+
+<div class="fixed inset-0 bg-brandDark z-[99999] flex flex-col items-center justify-center transition-opacity duration-300" id="loadingScreen">
+  <div class="text-center animate-bounce">
+    <div class="text-4xl font-black text-white tracking-wider font-outfit">MR <span class="text-brandOrange">BRAIN</span></div>
+    <div class="text-xs text-brandTeal font-bold tracking-[0.3em] mt-1 font-outfit">ADMIN PANEL</div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="flex h-screen w-full overflow-hidden">
+  
+  <nav class="w-72 bg-white border-l border-orange-100/40 h-full flex flex-col z-40 shadow-xl shadow-brandTeal/5 shrink-0 hidden md:flex">
+    <div class="p-6 border-b border-orange-50/50 flex flex-col items-center text-center">
+      <div class="w-20 h-20 rounded-full overflow-hidden ring-4 ring-brandOrange/20 mb-3 bg-brandBg flex items-center justify-center">
+        <img src="291873827_161657523091510_1933237999975051374_n.jpg" alt="Logo" class="object-cover w-full h-full" onerror="this.style.display='none'">
+      </div>
+      <div class="text-2xl font-black text-brandDark font-outfit">MR <span class="text-brandOrange">BRAIN</span></div>
+      <div class="text-[10px] text-brandTeal font-bold tracking-[0.2em] font-outfit">ADMIN PANEL</div>
+    </div>
+    
+    <div class="flex-1 p-4 space-y-1.5 overflow-y-auto" id="navContainer">
+      <button onclick="switchTab('dash', this)" class="nav-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold transition bg-teal-50 text-brandTeal border-r-4 border-brandTeal">
+        <i class="fa-solid fa-chart-pie text-lg"></i> إدارة المدرسين
+      </button>
+      <button onclick="switchTab('bookings', this)" class="nav-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold transition text-slate-500 hover:bg-gray-50">
+        <i class="fa-solid fa-calendar-check text-lg"></i> جدول الحجوزات
+      </button>
+      <button onclick="switchTab('setup', this)" class="nav-item w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold transition text-slate-500 hover:bg-gray-50">
+        <i class="fa-solid fa-link text-lg"></i> إعدادات الاتصال
+      </button>
+      <a href="index.html" class="w-full flex items-center gap-3 px-4 py-3.5 mt-4 rounded-xl font-bold transition bg-red-50 text-red-500 hover:bg-red-100 border border-red-100">
+        <i class="fa-solid fa-graduation-cap text-lg"></i> واجهة الطلاب
+      </a>
+    </div>
+  </nav>
+
+  <main class="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+    <header class="bg-white h-20 px-6 border-b border-orange-100/20 flex items-center shrink-0 shadow-sm z-30">
+      <div class="text-xl font-black text-brandDark">لوحة إدارة المنصة والأكاديمية</div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6 space-y-8">
+      
+      <section id="tab-dash" class="block">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          <div class="bg-white rounded-2xl shadow-sm border border-orange-100/40 overflow-hidden h-fit">
+            <div class="bg-brandBg/60 border-b border-gray-100 px-6 py-4 font-bold text-brandDark flex items-center gap-2">
+              <i class="fa-solid fa-user-plus text-brandTeal"></i> إضافة مدرس جديد
+            </div>
+            <div class="p-6 space-y-4">
+              <div class="space-y-1.5">
+                <label class="block text-xs font-black text-slate-500 uppercase">اسم المدرس ثلاثي</label>
+                <input type="text" id="t-name" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal focus:bg-white text-sm font-bold" placeholder="مثال: أ. محمود مصطفى">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-black text-slate-500 uppercase">المادة الدراسية</label>
+                  <select id="t-sub" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal text-sm font-bold">
+                    <option>رياضيات</option><option>فيزياء</option><option>كيمياء</option>
+                  </select>
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-black text-slate-500 uppercase">سعر الحصة / ساعة</label>
+                  <input type="number" id="t-price" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal text-sm font-bold" placeholder="150">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-black text-slate-500 uppercase">سنوات الخبرة</label>
+                  <input type="number" id="t-exp" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal text-sm font-bold" placeholder="5">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-black text-slate-500 uppercase">التقييم الأولي</label>
+                  <input type="number" id="t-rate" step="0.1" max="5" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal text-sm font-bold" placeholder="4.9">
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <label class="block text-xs font-black text-slate-500 uppercase">رابط الصورة (Google Drive)</label>
+                <input type="url" id="t-photo" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal text-sm font-bold" placeholder="انسخ رابط الصورة هنا">
+              </div>
+              <div class="space-y-1.5">
+                <label class="block text-xs font-black text-slate-500 uppercase">رابط فيديو العرض (YouTube)</label>
+                <input type="url" id="t-video" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal text-sm font-bold" placeholder="https://youtube.com/...">
+              </div>
+              <div class="space-y-1.5">
+                <label class="block text-xs font-black text-slate-500 uppercase">نبذة تعريفية</label>
+                <textarea id="t-bio" rows="3" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal text-sm font-bold resize-none" placeholder="اكتب النبذة هنا..."></textarea>
+              </div>
+              <button id="addTeacherBtn" class="w-full bg-brandTeal hover:bg-brandOrange text-white py-4 rounded-xl font-black transition shadow-lg mt-4 flex justify-center items-center gap-2" onclick="addTeacherPro()">
+                <i class="fa-solid fa-rocket text-xs"></i> نشر المعلم وإطلاقه فوراً
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-orange-100/40 overflow-hidden h-fit">
+            <div class="bg-brandBg/60 border-b border-gray-100 px-6 py-4 font-bold text-brandDark flex items-center gap-2">
+              <i class="fa-solid fa-users text-brandTeal"></i> فريق العمل بالمنصة
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-right text-sm">
+                <thead class="bg-gray-50 border-b border-gray-100 text-slate-500 font-bold">
+                  <tr><th class="p-4">الصورة</th><th class="p-4">البيانات</th><th class="p-4">التحكم</th></tr>
+                </thead>
+                <tbody id="adminTeachersRows" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+
+      <section id="tab-bookings" class="hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-orange-100/40 overflow-hidden">
+          <div class="bg-brandBg/60 border-b border-gray-100 px-6 py-4 font-bold text-brandDark flex items-center gap-2">
+            <i class="fa-solid fa-calendar-check text-brandTeal"></i> طلبات الحجز المستلمة
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-right text-sm">
+              <thead class="bg-gray-50 border-b border-gray-100 text-slate-500 font-bold">
+                <tr><th class="p-4">اسم الطالب</th><th class="p-4">الهاتف</th><th class="p-4">المدرس المعني</th><th class="p-4">المادة (النوع)</th><th class="p-4">المرحلة</th></tr>
+              </thead>
+              <tbody id="adminBookingsRows" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-setup" class="hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-orange-100/40 overflow-hidden max-w-xl mx-auto">
+          <div class="bg-brandBg/60 border-b border-gray-100 px-6 py-4 font-bold text-brandDark flex items-center gap-2">
+            <i class="fa-solid fa-link text-brandTeal"></i> ربط السيرفر السحابي
+          </div>
+          <div class="p-6 space-y-4">
+            <p class="text-sm text-slate-500 font-bold leading-relaxed mb-4">ضع رابط الـ Web App الخاص بسكربت Google لربط واجهة المشرف والطلاب بقاعدة البيانات.</p>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-black text-slate-500 uppercase">Web App URL</label>
+              <input type="url" id="api-url-input" class="w-full p-3.5 bg-brandBg/40 border border-gray-200 rounded-xl outline-none focus:border-brandTeal text-sm font-bold" placeholder="https://script.google.com/...">
+            </div>
+            <button class="w-full bg-brandOrange hover:bg-brandDark text-white py-4 rounded-xl font-black transition shadow-lg mt-2 flex justify-center items-center gap-2" onclick="saveConfiguration()">
+              <i class="fa-solid fa-floppy-disk text-xs"></i> حفظ وتحديث الاتصال
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
