@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Cairo", sans-serif;
+  background-color: #FAF8F0;
+  color: #1a1a2e;
+  min-height: 100vh;
+  direction: rtl;
+}
+
+.num { font-family: "Outfit", sans-serif; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #51A3A3; border-radius: 3px; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px) scale(.95); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes toastIn {
+  from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+  to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+@keyframes toastOut {
+  from { transform: translateX(-50%) translateY(0); opacity: 1; }
+  to { transform: translateX(-50%) translateY(100px); opacity: 0; }
+}
+
+.animate-fade-in { animation: fadeIn 0.25s ease both; }
+.animate-slide-up { animation: slideUp 0.3s cubic-bezier(.34,1.56,.64,1) both; }
+.animate-spin-custom { animation: spin 1s linear infinite; }
+.toast-in { animation: toastIn 0.35s cubic-bezier(.34,1.56,.64,1) both; }
+.toast-out { animation: toastOut 0.35s ease both; }
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #51A3A3 !important;
+  box-shadow: 0 0 0 3px rgba(81,163,163,0.15);
+}
+
+.data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.data-table thead th {
+  background: #51A3A3; color: white; padding: .75rem 1rem;
+  font-weight: 600; font-size: .85rem;
+}
+.data-table thead th:first-child { border-radius: 0 12px 0 0; }
+.data-table thead th:last-child  { border-radius: 12px 0 0 0; }
+.data-table tbody tr { transition: background .15s; }
+.data-table tbody tr:hover { background: #f0fafa; }
+.data-table tbody td {
+  padding: .7rem 1rem; border-bottom: 1px solid #f0f0e8;
+  font-size: .875rem;
+}
+
+.subject-checkbox-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: .5rem; max-height: 160px; overflow-y: auto;
+  padding: .5rem; border: 1.5px solid #e5e7eb; border-radius: .75rem;
+}
+
+.subject-checkbox-item {
+  display: flex; align-items: center; gap: .4rem;
+  padding: .4rem .6rem; border-radius: .5rem;
+  cursor: pointer; transition: background .15s; font-size: .875rem;
+}
+.subject-checkbox-item:hover { background: #f0fafa; }
+.subject-checkbox-item input[type=checkbox] { accent-color: #51A3A3; width: 16px; height: 16px; }
+
+.score-band {
+  background: white; border-radius: 1.25rem; padding: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  border-right: 5px solid #51A3A3;
+}
+
+@media (max-width: 640px) {
+  .nav-label { display: none; }
+}
